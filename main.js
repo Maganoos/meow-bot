@@ -30,11 +30,12 @@ client.once('ready', () => {
 });
 
 client.on('messageCreate', async (message) => {
-  if (CHANNEL_IDS.includes(message.channel.id) && (message.content.startsWith('!online') || message.content.startsWith('--online'))) {
-    const onlinePlayers = await fetchOnlinePlayers();
-    message.reply(onlinePlayers);
-  } else if (CHANNEL_IDS.includes(message.channel.id)) {
-    if (message.content.toLowerCase().startsWith("meow, kill")) {
+  if (CHANNEL_IDS.includes(message.channel.id)) {
+    if (message.content.toLowerCase().startsWith('!online') || message.content.toLowerCase().startsWith('--online')) {
+      const onlinePlayers = await fetchOnlinePlayers();
+      message.reply(onlinePlayers);
+    } 
+    else if (message.content.toLowerCase().startsWith("meow, kill")) {
       if (!message.reference) {
         message.reply("🔫💨");
       } else {
@@ -45,7 +46,8 @@ client.on('messageCreate', async (message) => {
           console.error('Error fetching referenced message:', error);
         }
       }
-    } else if (message.content.toLowerCase().startsWith("meow, lobotomize")) {
+    } 
+    else if (message.content.toLowerCase().startsWith("meow, lobotomize")) {
       if (!message.reference) {
         message.reply("🧠🔨");
       } else {
