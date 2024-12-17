@@ -58,6 +58,9 @@ client.on('messageCreate', async (message) => {
         }
       }
     }
+    else if (message.content.toLowerCase().startsWith('hello meow') || message.content.toLowerCase().startsWith('hello little meow')) {
+      message.reply(`Hello, ${message.author.displayName}!\nhttps://www.youtube.com/watch?v=kW304_lER5E`);
+    }
   }
 });
 
