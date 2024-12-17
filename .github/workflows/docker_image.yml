@@ -18,17 +18,9 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Create .env file from GitHub Secrets
-      run: |
-        echo "TOKEN=${{ secrets.DISCORD_TOKEN }}" >> meow.env
-
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
       with:
         context: .
         push: true
         tags: maganoos/meow-bot:latest
-
-    - name: Clean up .env file
-      run: |
-        rm meow.env
