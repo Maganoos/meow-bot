@@ -1,6 +1,5 @@
 import { Client } from 'discord.js-selfbot-v13';
 import axios from 'axios';
-import 'dotenv/config';
 
 const CHANNEL_IDS = ['782651599926984704', '1286362396213903442'];
 
