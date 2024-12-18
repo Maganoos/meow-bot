@@ -59,7 +59,10 @@ client.on('messageCreate', async (message) => {
       }
     }
     else if (message.content.toLowerCase().startsWith('hello meow') || message.content.toLowerCase().startsWith('hello little meow')) {
-      message.reply(`Hello, ${message.author.displayName}!\nhttps://www.youtube.com/watch?v=kW304_lER5E`);
+      message.reply(`Hello, ${message.author.displayName}!\nhttps://youtu.be/kW304_lER5E`);
+    }
+    else if (message.content.toLowerCase().startsWith("meow, who is the most sigma out of all people on earth")) {
+      message.reply("It is I, meow the third of meowington")
     }
   }
 });
