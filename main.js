@@ -43,11 +43,25 @@ async function executeLobotomizeCommand(message) {
 }
 
 async function executePingCommand(message) {
-  const msg = await await message.reply('Pinging...');
+  const msg = await message.reply('Pinging...');
   const latency = Math.round(client.ws.ping);
   await msg.edit(`Pong! Latency: ${latency}ms`); 
 }
 
+async function executeLoveCheckerCommand(message) {
+  let people = message.content.split(' ').slice(2).filter(word => word.toLowerCase() !== 'and');
+  if (people.length < 2) {
+    await message.reply('Please provide at least two people to check love for.');
+    return;
+  }
+  const percentage = Math.floor(Math.random() * 100);
+  await message.reply(`The love between ${people.join(', and ')} is ${percentage}%`);
+  if (percentage >= 50) {
+    await message.channel.send('You are loved! 💕'); 
+  } else {
+    await message.channel.send('You are not loved. 💔');
+  }
+}
 client.once('ready', () => {
   console.log(`${client.user.username} is ready!`);
 });
@@ -76,6 +90,7 @@ client.on('messageCreate', async (msg) => {
     "who is the most sigma out of all people on earth": createReply("It is I, meow the third of meowington"),
     "what is the meaning of life": createReply("being silly"),
     "ping": executePingCommand,
+    "lovechecker": executeLoveCheckerCommand,
   };
 
   const match = Object.entries(commandActions)
