@@ -104,16 +104,19 @@ async function executeSkinCommand(message) {
     }
 
     const skinJson = JSON.parse(Buffer.from(skinData.value, 'base64').toString('utf-8'));
-    const skinUrl = skinJson.textures.SKIN.url; // Get the skin URL
+    const skinUrl = skinJson.textures.SKIN.url;
 
-    await message.reply(`Here is the skin for [${username[0]}](${skinUrl}) [Render](https://starlightskins.lunareclipse.studio/render/default/${username[0]}/full)`);
+    await message.reply(`Here is the skin for [\\${username[0]}](${skinUrl})\n[Render](https://starlightskins.lunareclipse.studio/render/default/${username[0]}/full)`);
   } catch (error) {
     console.error('Error fetching skin:', error);
     await message.reply('Sorry, there was an error fetching the skin.');
   }
 }
 
-
+async function executeDiscordPingCommand(message) {
+  const id = message.content.split(' ').slice(2)[0];
+  await message.reply('<@' + id + '>');
+}
 
 client.once('ready', () => {
   console.log(`${client.user.username} is ready!`);
@@ -147,6 +150,7 @@ client.on('messageCreate', async (msg) => {
     "unlobotomize": executeUnlobotomizeCommand,
     "help": executeHelpCommand,
     "skin": executeSkinCommand,
+    "pingforme": executeDiscordPingCommand,
   };
 
   const match = Object.entries(commandActions)
@@ -157,7 +161,5 @@ client.on('messageCreate', async (msg) => {
     await action(msg, commandActions);
   }
 });
-
-
 
 client.login(process.env.TOKEN);
