@@ -75,7 +75,7 @@ async function executeHelpCommand(message, commandActions) {
 }
 
 async function executeSkinCommand(message) {
-  const username = message.content.split(' ').slice(2); // Get the username from the command message
+   const username = message.content.split(' ').slice(2); // Get the username from the command message
 
   if (username.length !== 1) {  // Ensure that exactly one username is provided
     await message.reply('Please provide only one username.');
@@ -91,6 +91,7 @@ async function executeSkinCommand(message) {
 
     // Step 2: Fetch the skin from the UUID
     const uuid = profileResponse.data.id; // Get the UUID
+    const username = profile.response.data.name;
     const skinResponse = await axios.get(`https://sessionserver.mojang.com/session/minecraft/profile/${uuid}`, {
       headers: {
         'Accept': 'application/json',
@@ -106,7 +107,7 @@ async function executeSkinCommand(message) {
     const skinJson = JSON.parse(Buffer.from(skinData.value, 'base64').toString('utf-8'));
     const skinUrl = skinJson.textures.SKIN.url;
 
-    await message.reply(`Here is the skin for [\\${username[0]}](${skinUrl})\n[Render](https://starlightskins.lunareclipse.studio/render/default/${username[0]}/full)`);
+    await message.reply(`Here is the skin for:\n\\[${username[0]}](${skinUrl})\n[Render](https://starlightskins.lunareclipse.studio/render/default/${username[0]}/full)`);
   } catch (error) {
     console.error('Error fetching skin:', error);
     await message.reply('Sorry, there was an error fetching the skin.');
