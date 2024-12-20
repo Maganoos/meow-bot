@@ -83,7 +83,7 @@ async function executeHelpCommand(message, commandActions) {
   const availableCommands = Object.keys(commandActions)
     .sort()
     .join(', ');
-    await message.reply(`Available commands: ${availableCommands}`);
+    await message.reply(`Available commands: ${availableCommands}\nUse \`meow, :command\` to execute`);
 }
 
 async function executeSkinCommand(message) {
