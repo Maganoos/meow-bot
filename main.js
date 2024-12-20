@@ -145,12 +145,12 @@ client.on('messageCreate', async (msg) => {
     "lobotomize": executeLobotomizeCommand,
     "who is the most sigma out of all people on earth": createReply("It is I, meow the third of meowington"),
     "what is the meaning of life": createReply("being silly"),
+    "pingforme": executeDiscordPingCommand,
     "ping": executePingCommand,
     "lovechecker": executeLoveCheckerCommand,
     "unlobotomize": executeUnlobotomizeCommand,
     "help": executeHelpCommand,
     "skin": executeSkinCommand,
-    "pingforme": executeDiscordPingCommand,
   };
 
   const match = Object.entries(commandActions)
