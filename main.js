@@ -210,6 +210,8 @@ client.on('messageCreate', async (msg) => {
     "skin": executeSkinCommand,
     "guac": executeGuacCommand,
     "math": executeMathCommand,
+    "repo": createReply("https://github.com/Maganoos/meow-bot"),
+    "owner": createReply("https://magnuskari.cc"),
   };
 
   const match = Object.entries(commandActions)
