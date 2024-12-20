@@ -12,8 +12,8 @@ const config = {
 };
 const math = create(all, config);
 
-const BANNED_IDS = ['1116009825042702366']
-const BANNED_NAMES = ['Rubuhhhh']
+const BANNED_IDS = ['1116009825042702366', '789531205908430868']
+const BANNED_NAMES = ['Rubuhhhh', 'oAikl']
 
 const client = new Client();
 
