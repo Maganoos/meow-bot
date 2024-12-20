@@ -149,8 +149,14 @@ async function executeMathCommand(message) {
     return;
   }
 
+  expression = expression.replace(/\*\*/g, '^').replace(/x/g, '*');
+
   try {
     const result = math.evaluate(expression);
+    if (result > 100000000000000000){
+      await message.reply('Result is too large to display.');
+      return;
+    } 
     await message.reply(`Result: ${result}`);
   } catch (error) {
     console.error('Error evaluating expression:', error);
