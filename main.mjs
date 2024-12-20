@@ -30,39 +30,58 @@ client.once('ready', () => {
 
 client.on('messageCreate', async (message) => {
   if (CHANNEL_IDS.includes(message.channel.id)) {
-    if (message.content.toLowerCase().startsWith('!online') || message.content.toLowerCase().startsWith('--online')) {
-      const onlinePlayers = await fetchOnlinePlayers();
-      message.reply(onlinePlayers);
-    } 
-    else if (message.content.toLowerCase().startsWith("meow, kill")) {
-      if (!message.reference) {
-        message.reply("🔫💨");
-      } else {
-        try {
-          const referencedMessage = await message.fetchReference();
-          referencedMessage.reply("🔫💨");
-        } catch (error) {
-          console.error('Error fetching referenced message:', error);
-        }
+    const messageContent = message.content.toLowerCase();
+    if (messageContent.startsWith('meow,' )) {
+      const commandContent = messageContent.replace(/^meow,\s*/, '');
+
+      switch (true) {
+        case commandContent.startsWith('online'):
+          message.reply(await fetchOnlinePlayers());
+          break;
+
+        case commandContent.startsWith("kill"):
+          if (!message.reference) {
+            message.reply("🔫💨");
+          } else {
+            try {
+              const referencedMessage = await message.fetchReference();
+              referencedMessage.reply("🔫💨");
+            } catch (error) {
+              console.error('Error fetching referenced message:', error);
+            }
+          }
+          break;
+
+        case commandContent.startsWith("lobotomize"):
+          if (!message.reference) {
+            message.reply("🧠🔨");
+          } else {
+            try {
+              const referencedMessage = await message.fetchReference();
+              referencedMessage.reply("🧠🔨");
+            } catch (error) {
+              console.error('Error fetching referenced message:', error);
+            }
+          }
+          break;
+
+        case commandContent.startsWith("who is the most sigma out of all people on earth"):
+          message.reply("It is I, meow the third of meowington");
+          break;
+
+        case commandContent.startsWith("what is the meaning of life"):
+          message.reply("being silly");
+          break;
+
+        case commandContent.startsWith('ping'):
+          const msg = await message.reply('Pinging...');
+          const latency = Math.round(client.ws.ping);
+          await msg.edit(`Pong! Latency: ${latency}ms`); 
+          break;
+
+        default:
+          break;
       }
-    } 
-    else if (message.content.toLowerCase().startsWith("meow, lobotomize")) {
-      if (!message.reference) {
-        message.reply("🧠🔨");
-      } else {
-        try {
-          const referencedMessage = await message.fetchReference();
-          referencedMessage.reply("🧠🔨");
-        } catch (error) {
-          console.error('Error fetching referenced message:', error);
-        }
-      }
-    }
-    else if (message.content.toLowerCase().startsWith('hello meow') || message.content.toLowerCase().startsWith('hello little meow')) {
-      message.reply(`Hello, ${message.author.displayName}!\nhttps://youtu.be/kW304_lER5E`);
-    }
-    else if (message.content.toLowerCase().startsWith("meow, who is the most sigma out of all people on earth")) {
-      message.reply("It is I, meow the third of meowington")
     }
   }
 });
