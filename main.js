@@ -142,21 +142,20 @@ async function executeGuacCommand(message) {
 }
 
 async function executeMathCommand(message) {
-  const expression = message.content.split(' ').slice(2).join(' ');
+  // Extract the mathematical expression from the message
+  let expression = message.content.split(' ').slice(2).join(' ');
+
+  // Replace ** with ^ and x with *
+  expression = expression.replace(/\*\*/g, '^').replace(/x/g, '*');
 
   if (!expression) {
     await message.reply('Please provide a mathematical expression to evaluate.');
     return;
   }
 
-  expression = expression.replace(/\*\*/g, '^').replace(/x/g, '*');
-
   try {
+    // Evaluate the expression using mathjs
     const result = math.evaluate(expression);
-    if (result > 100000000000000000){
-      await message.reply('Result is too large to display.');
-      return;
-    } 
     await message.reply(`Result: ${result}`);
   } catch (error) {
     console.error('Error evaluating expression:', error);
