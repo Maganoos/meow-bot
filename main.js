@@ -117,6 +117,21 @@ async function executeDiscordPingCommand(message) {
   await message.reply('<@' + id + '>');
 }
 
+async function executeGuacCommand(message) {
+  try {
+    const response = await fetch('https://www.eepy.monster/api/images');
+    const data = await response.json();
+    const maxImages = data.images;
+
+    const randomNumber = Math.floor(Math.random() * maxImages) + 1;
+
+    message.reply(`https://cdn.eepy.monster/guac${randomNumber}.jpg`);
+
+  } catch (error) {
+    console.error('Error fetching image:', error);
+  }
+}
+
 client.once('ready', () => {
   console.log(`${client.user.username} is ready!`);
 });
@@ -150,6 +165,7 @@ client.on('messageCreate', async (msg) => {
     "unlobotomize": executeUnlobotomizeCommand,
     "help": executeHelpCommand,
     "skin": executeSkinCommand,
+    "guac": executeGuacCommand,
   };
 
   const match = Object.entries(commandActions)
