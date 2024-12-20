@@ -12,6 +12,9 @@ const config = {
 };
 const math = create(all, config);
 
+const BANNED_IDS = ['1116009825042702366']
+const BANNED_NAMES = ['Rubuhhhh']
+
 const client = new Client();
 
 async function executeOnlineCommand(message) {
@@ -180,6 +183,12 @@ client.on('messageCreate', async (msg) => {
   const messageContent = msg.content.toLowerCase();
   
   if (!messageContent.startsWith('meow,'))
+    return;
+
+  if (msg.author.id === client.user.id)
+    return;
+
+  if (BANNED_IDS.includes(msg.author.id) || BANNED_NAMES.includes(msg.author.displayName))
     return;
 
   const commandContent = messageContent.replace(/^meow,\s*/, '');
