@@ -54,14 +54,67 @@ async function executeLoveCheckerCommand(message) {
     await message.reply('Please provide at least two people to check love for.');
     return;
   }
-  const percentage = Math.floor(Math.random() * 100);
-  await message.reply(`The love between ${people.join(', and ')} is ${percentage}%`);
-  if (percentage >= 50) {
-    await message.channel.send('You are loved! 💕'); 
+  await message.reply(`The love between ${people.join(' and ')} is ${Math.floor(Math.random() * 100)}%`);
+}
+
+
+async function executeUnlobotomizeCommand(message) {
+  if (!message.reference) {
+    await message.reply("🧠🤕");
   } else {
-    await message.channel.send('You are not loved. 💔');
+    const referencedMessage = await message.fetchReference();
+    await referencedMessage.reply("🧠🤕");
   }
 }
+
+async function executeHelpCommand(message, commandActions) {
+  const availableCommands = Object.keys(commandActions)
+    .sort()
+    .join(', ');
+    await message.reply(`Available commands: ${availableCommands}`);
+}
+
+async function executeSkinCommand(message) {
+  const username = message.content.split(' ').slice(2); // Get the username from the command message
+
+  if (username.length !== 1) {  // Ensure that exactly one username is provided
+    await message.reply('Please provide only one username.');
+    return;
+  }
+
+  try {
+    // Step 1: Fetch the user's Minecraft UUID
+    const profileResponse = await axios.get(`https://api.mojang.com/users/profiles/minecraft/${username[0]}`);
+    if (!profileResponse.data) {
+      return await message.reply(`User ${username[0]} not found.`);
+    }
+
+    // Step 2: Fetch the skin from the UUID
+    const uuid = profileResponse.data.id; // Get the UUID
+    const skinResponse = await axios.get(`https://sessionserver.mojang.com/session/minecraft/profile/${uuid}`, {
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+
+    // Step 3: Extract the skin URL from the response
+    const skinData = skinResponse.data.properties.find(prop => prop.name === 'textures');
+    if (!skinData) {
+      return await message.reply(`No skin found for ${username[0]}.`);
+    }
+
+    const skinJson = JSON.parse(Buffer.from(skinData.value, 'base64').toString('utf-8'));
+    const skinUrl = skinJson.textures.SKIN.url; // Get the skin URL
+
+    await message.reply(`Here is the skin for [${username[0]}](${skinUrl}) [Render](https://starlightskins.lunareclipse.studio/render/default/${username[0]}/full)`);
+  } catch (error) {
+    console.error('Error fetching skin:', error);
+    await message.reply('Sorry, there was an error fetching the skin.');
+  }
+}
+
+
+
 client.once('ready', () => {
   console.log(`${client.user.username} is ready!`);
 });
@@ -91,6 +144,9 @@ client.on('messageCreate', async (msg) => {
     "what is the meaning of life": createReply("being silly"),
     "ping": executePingCommand,
     "lovechecker": executeLoveCheckerCommand,
+    "unlobotomize": executeUnlobotomizeCommand,
+    "help": executeHelpCommand,
+    "skin": executeSkinCommand,
   };
 
   const match = Object.entries(commandActions)
@@ -98,7 +154,7 @@ client.on('messageCreate', async (msg) => {
 
   if (match) {
     const [_key, action] = match;
-    await action(msg);
+    await action(msg, commandActions);
   }
 });
 
