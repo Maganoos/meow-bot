@@ -159,6 +159,7 @@ async function executeMathCommand(message) {
   try {
     // Evaluate the expression using mathjs
     const result = math.evaluate(expression);
+    if (result >= 100000000000000000) return;
     await message.reply(`Result: ${result}`);
   } catch (error) {
     console.error('Error evaluating expression:', error);
