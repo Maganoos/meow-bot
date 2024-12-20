@@ -190,6 +190,7 @@ client.on('messageCreate', async (msg) => {
     return;
 
   if (BANNED_IDS.includes(msg.author.id) || BANNED_NAMES.includes(msg.author.displayName))
+    message.reply("nuh uh, you're not allowed to use meow");
     return;
 
   const commandContent = messageContent.replace(/^meow,\s*/, '');
