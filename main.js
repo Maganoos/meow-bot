@@ -1,7 +1,16 @@
 import { Client } from 'discord.js-selfbot-v13';
 import axios from 'axios';
+import { create, all } from 'mathjs';
 
 const CHANNEL_IDS = ['782651599926984704', '1286362396213903442'];
+
+const config = {
+  // Allow basic arithmetic, power, and root functions
+  functions: ['add', 'subtract', 'multiply', 'divide', 'pow', 'sqrt'],
+  // Disable access to potentially unsafe functions
+  unsafe: false
+};
+const math = create(all, config);
 
 const client = new Client();
 
@@ -132,6 +141,23 @@ async function executeGuacCommand(message) {
   }
 }
 
+async function executeMathCommand(message) {
+  const expression = message.content.split(' ').slice(2).join(' ');
+
+  if (!expression) {
+    await message.reply('Please provide a mathematical expression to evaluate.');
+    return;
+  }
+
+  try {
+    const result = math.evaluate(expression);
+    await message.reply(`Result: ${result}`);
+  } catch (error) {
+    console.error('Error evaluating expression:', error);
+    await message.reply('Invalid mathematical expression.');
+  }
+}
+
 client.once('ready', () => {
   console.log(`${client.user.username} is ready!`);
 });
@@ -166,6 +192,7 @@ client.on('messageCreate', async (msg) => {
     "help": executeHelpCommand,
     "skin": executeSkinCommand,
     "guac": executeGuacCommand,
+    "math": executeMathCommand,
   };
 
   const match = Object.entries(commandActions)
