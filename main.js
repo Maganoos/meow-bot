@@ -75,39 +75,37 @@ async function executeHelpCommand(message, commandActions) {
 }
 
 async function executeSkinCommand(message) {
-   const username = message.content.split(' ').slice(2); // Get the username from the command message
-
-  if (username.length !== 1) {  // Ensure that exactly one username is provided
+  const args = message.content.split(' ');
+  if (args.length !== 3) {
     await message.reply('Please provide only one username.');
     return;
   }
 
+  const username = args[2];
+
   try {
-    // Step 1: Fetch the user's Minecraft UUID
-    const profileResponse = await axios.get(`https://api.mojang.com/users/profiles/minecraft/${username[0]}`);
+    const profileResponse = await axios.get(`https://api.mojang.com/users/profiles/minecraft/${username}`);
     if (!profileResponse.data) {
-      return await message.reply(`User ${username[0]} not found.`);
+      return await message.reply(`User ${username} not found.`);
     }
 
-    // Step 2: Fetch the skin from the UUID
-    const uuid = profileResponse.data.id; // Get the UUID
-    const username = profile.response.data.name;
+    const correctUsername = profileResponse.data.name;
+    const uuid = profileResponse.data.id;
     const skinResponse = await axios.get(`https://sessionserver.mojang.com/session/minecraft/profile/${uuid}`, {
       headers: {
         'Accept': 'application/json',
       },
     });
 
-    // Step 3: Extract the skin URL from the response
     const skinData = skinResponse.data.properties.find(prop => prop.name === 'textures');
     if (!skinData) {
-      return await message.reply(`No skin found for ${username[0]}.`);
+      return await message.reply(`No skin found for ${correctUsername}.`);
     }
 
     const skinJson = JSON.parse(Buffer.from(skinData.value, 'base64').toString('utf-8'));
     const skinUrl = skinJson.textures.SKIN.url;
 
-    await message.reply(`Here is the skin for:\n\\[${username[0]}](${skinUrl})\n[Render](https://starlightskins.lunareclipse.studio/render/default/${username[0]}/full)`);
+    await message.reply(`Here is the skin for:\n[${correctUsername}](${skinUrl})\n[Render](https://starlightskins.lunareclipse.studio/render/default/${correctUsername}/full)`);
   } catch (error) {
     console.error('Error fetching skin:', error);
     await message.reply('Sorry, there was an error fetching the skin.');
