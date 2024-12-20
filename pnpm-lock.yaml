@@ -14,9 +14,6 @@ importers:
       discord.js-selfbot-v13:
         specifier: latest
         version: 3.4.6
-      dotenv:
-        specifier: ^16.0.0
-        version: 16.4.7
 
 packages:
 
@@ -117,10 +114,6 @@ packages:
   discord.js-selfbot-v13@3.4.6:
     resolution: {integrity: sha512-qFvco5SQ/h1CxAwVs4Kg2vU1tfiS0WExEwD1Rj15fPpr1p5BmviAM7K+iZsoQ2biflYjn2ALCko/Vl5oFsbjRQ==}
     engines: {node: '>=16.6.0', npm: '>=7.0.0'}
-
-  dotenv@16.4.7:
-    resolution: {integrity: sha512-47qPchRCykZC03FhkYAhrvwU4xDBFIj1QPqaarj6mdM/hgUzfPHcpkHJOn3mJAufFeeAxAzeGsr5X0M4k6fLZQ==}
-    engines: {node: '>=12'}
 
   emoji-regex@8.0.0:
     resolution: {integrity: sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==}
@@ -430,8 +423,6 @@ snapshots:
       - opusscript
       - supports-color
       - utf-8-validate
-
-  dotenv@16.4.7: {}
 
   emoji-regex@8.0.0: {}
 

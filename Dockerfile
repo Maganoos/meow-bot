@@ -2,10 +2,11 @@ FROM node:latest
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY package.json ./
+COPY pnpm-lock.yaml ./
 
-RUN npm install
+RUN pnpm install
 
 COPY . .
 
-CMD ["node", "main.mjs"]
+CMD ["node", "main.js"]
