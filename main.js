@@ -117,7 +117,7 @@ async function executeSkinCommand(message) {
     const skinJson = JSON.parse(Buffer.from(skinData.value, 'base64').toString('utf-8'));
     const skinUrl = skinJson.textures.SKIN.url;
 
-    await message.reply(`Here is the skin for:\n[${correctUsername}](${skinUrl})\n[Render](https://starlightskins.lunareclipse.studio/render/default/${correctUsername}/full)`);
+    await message.reply(`Here is the skin for:\n[${correctUsername}](${skinUrl})\n[Render](https://starlightskins.lunareclipse.studio/render/mojavatar/${uuid}/full)`);
   } catch (error) {
     console.error('Error fetching skin:', error);
     await message.reply('Sorry, there was an error fetching the skin.');
