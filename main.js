@@ -48,9 +48,9 @@ async function executeLobotomizeCommand(msg) {
 }
 
 async function executePingCommand(msg) {
-  const msg = await msg.reply('Pinging...');
+  const pingMessage = await msg.reply('Pinging...');
   const latency = Math.round(client.ws.ping);
-  await msg.edit(`Pong! Latency: ${latency}ms`); 
+  await pingMessage.edit(`Pong! Latency: ${latency}ms`);
 }
 
 async function executeLoveCheckerCommand(msg) {
