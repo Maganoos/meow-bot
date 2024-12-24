@@ -4,20 +4,13 @@ import { create, all } from 'mathjs';
 
 const CHANNEL_IDS = ['782651599926984704', '1286362396213903442'];
 
-const config = {
-  // Allow basic arithmetic, power, and root functions
-  functions: ['add', 'subtract', 'multiply', 'divide', 'pow', 'sqrt'],
-  // Disable access to potentially unsafe functions
-  unsafe: false
-};
-const math = create(all, config);
-
-const BANNED_IDS = ['1116009825042702366', '789531205908430868']
-const BANNED_NAMES = ['Rubuhhhh', 'oAikl']
+const BANNED_IDS = ['1116009825042702366', '789531205908430868'];
+const BANNED_NAMES = ['Rubuhhhh', 'oAikl'];
 
 const client = new Client();
+const math = create(all, {functions: ['add', 'subtract', 'multiply', 'divide', 'pow', 'sqrt'], unsafe: false});
 
-async function executeOnlineCommand(message) {
+async function executeOnlineCommand(msg) {
   try {
     const response = await axios.get('https://api.mcsrvstat.us/3/play.alinea.gg');
     if (response.data && response.data.players && response.data.players.list) {
@@ -26,70 +19,68 @@ async function executeOnlineCommand(message) {
       const formattedNames = playerNames.length > 0
         ? playerNames.slice(0, -1).join(', ') + (playerNames.length > 1 ? ` and ${playerNames[playerNames.length - 1]}` : playerNames[0])
         : 'No players online';
-      await message.reply(`Currently ${playerCount} player(s) online:\n\`\`\`${formattedNames}\`\`\``);
+      await msg.reply(`Currently ${playerCount} player(s) online:\n\`\`\`${formattedNames}\`\`\``);
     } else {
-      await message.reply('No players online.');
+      await msg.reply('No players online.');
     }
   } catch (error) {
     console.error('Error fetching data:', error);
-    await message.reply('Error fetching player data.');
+    await msg.reply('Error fetching player data.');
   }
 }
 
-async function executeKillCommand(message) {
-  if (!message.reference) {
-    await message.reply("🔫💨");
+async function executeKillCommand(msg) {
+  if (!msg.reference) {
+    await msg.reply("🔫💨");
   } else {
-    const referencedMessage = await message.fetchReference();
+    const referencedMessage = await msg.fetchReference();
     await referencedMessage.reply("🔫💨");
   }
 }
 
-async function executeLobotomizeCommand(message) {
-  if (!message.reference) {
-    await message.reply("🧠🔨");
+async function executeLobotomizeCommand(msg) {
+  if (!msg.reference) {
+    await msg.reply("🧠🔨");
   } else {
-    const referencedMessage = await message.fetchReference();
+    const referencedMessage = await msg.fetchReference();
     await referencedMessage.reply("🧠🔨");
   }
 }
 
-async function executePingCommand(message) {
-  const msg = await message.reply('Pinging...');
+async function executePingCommand(msg) {
+  const msg = await msg.reply('Pinging...');
   const latency = Math.round(client.ws.ping);
   await msg.edit(`Pong! Latency: ${latency}ms`); 
 }
 
-async function executeLoveCheckerCommand(message) {
-  let people = message.content.split(' ').slice(2).filter(word => word.toLowerCase() !== 'and');
+async function executeLoveCheckerCommand(msg) {
+  let people = msg.content.split(' ').slice(2).filter(word => word.toLowerCase() !== 'and');
   if (people.length < 2) {
-    await message.reply('Please provide at least two people to check love for.');
+    await msg.reply('Please provide at least two people to check love for.');
     return;
   }
-  await message.reply(`The love between ${people.join(' and ')} is ${Math.floor(Math.random() * 100)}%`);
+  await msg.reply(`The love between ${people.join(' and ')} is ${Math.floor(Math.random() * 100)}%`);
 }
 
 
-async function executeUnlobotomizeCommand(message) {
-  if (!message.reference) {
-    await message.reply("🧠🤕");
+async function executeUnlobotomizeCommand(msg) {
+  if (!msg.reference) {
+    await msg.reply("🧠🤕");
   } else {
-    const referencedMessage = await message.fetchReference();
+    const referencedMessage = await msg.fetchReference();
     await referencedMessage.reply("🧠🤕");
   }
 }
 
-async function executeHelpCommand(message, commandActions) {
-  const availableCommands = Object.keys(commandActions)
-    .sort()
-    .join(', ');
-    await message.reply(`Available commands: ${availableCommands}\nUse \`meow, :command\` to execute`);
+async function executeHelpCommand(msg, commandActions) {
+  const availableCommands = Object.keys(commandActions).sort().join(', ');
+    await msg.reply(`Available commands: \`\`\`${availableCommands}\`\`\`\nUse \`meow, :command\` to execute`);
 }
 
-async function executeSkinCommand(message) {
-  const args = message.content.split(' ');
+async function executeSkinCommand(msg) {
+  const args = msg.content.split(' ');
   if (args.length !== 3) {
-    await message.reply('Please provide only one username.');
+    await msg.reply('Please provide only one username.');
     return;
   }
 
@@ -98,7 +89,7 @@ async function executeSkinCommand(message) {
   try {
     const profileResponse = await axios.get(`https://api.mojang.com/users/profiles/minecraft/${username}`);
     if (!profileResponse.data) {
-      return await message.reply(`User ${username} not found.`);
+      return await msg.reply(`User ${username} not found.`);
     }
 
     const correctUsername = profileResponse.data.name;
@@ -111,25 +102,25 @@ async function executeSkinCommand(message) {
 
     const skinData = skinResponse.data.properties.find(prop => prop.name === 'textures');
     if (!skinData) {
-      return await message.reply(`No skin found for ${correctUsername}.`);
+      return await msg.reply(`No skin found for ${correctUsername}.`);
     }
 
     const skinJson = JSON.parse(Buffer.from(skinData.value, 'base64').toString('utf-8'));
     const skinUrl = skinJson.textures.SKIN.url;
 
-    await message.reply(`Here is the skin for:\n[${correctUsername}](${skinUrl})\n[Render](https://starlightskins.lunareclipse.studio/render/mojavatar/${uuid}/full)`);
+    await msg.reply(`Here is the skin for:\n[${correctUsername}](${skinUrl})\n[Render](https://starlightskins.lunareclipse.studio/render/mojavatar/${uuid}/full)`);
   } catch (error) {
     console.error('Error fetching skin:', error);
-    await message.reply('Sorry, there was an error fetching the skin.');
+    await msg.reply('Sorry, there was an error fetching the skin.');
   }
 }
 
-async function executeDiscordPingCommand(message) {
-  const id = message.content.split(' ').slice(2)[0];
-  await message.reply('<@' + id + '>');
+async function executeDiscordPingCommand(msg) {
+  const id = msg.content.split(' ').slice(2)[0];
+  await msg.reply(`Boop! :3 <@${id}>`);
 }
 
-async function executeGuacCommand(message) {
+async function executeGuacCommand(msg) {
   try {
     const response = await fetch('https://www.eepy.monster/api/images');
     const data = await response.json();
@@ -137,22 +128,22 @@ async function executeGuacCommand(message) {
 
     const randomNumber = Math.floor(Math.random() * maxImages) + 1;
 
-    message.reply(`https://cdn.eepy.monster/guac${randomNumber}.jpg`);
+    msg.reply(`https://cdn.eepy.monster/guac${randomNumber}.jpg`);
 
   } catch (error) {
     console.error('Error fetching image:', error);
   }
 }
 
-async function executeMathCommand(message) {
+async function executeMathCommand(msg) {
   // Extract the mathematical expression from the message
-  let expression = message.content.split(' ').slice(2).join(' ');
+  let expression = msg.content.split(' ').slice(2).join(' ');
 
   // Replace ** with ^ and x with *
   expression = expression.replace(/\*\*/g, '^').replace(/x/g, '*');
 
   if (!expression) {
-    await message.reply('Please provide a mathematical expression to evaluate.');
+    await msg.reply('Please provide a mathematical expression to evaluate.');
     return;
   }
 
@@ -160,10 +151,10 @@ async function executeMathCommand(message) {
     // Evaluate the expression using mathjs
     const result = math.evaluate(expression);
     if (result >= 100000000000000000) return;
-    await message.reply(`Result: ${result}`);
+    await msg.reply(`Result: ${result}`);
   } catch (error) {
     console.error('Error evaluating expression:', error);
-    await message.reply('Invalid mathematical expression.');
+    await msg.reply('Invalid mathematical expression.');
   }
 }
 
@@ -190,7 +181,7 @@ client.on('messageCreate', async (msg) => {
     return;
 
   if (BANNED_IDS.includes(msg.author.id) || BANNED_NAMES.includes(msg.author.displayName)){
-    message.reply("nuh uh, you're not allowed to use meow");
+    msg.reply("nuh uh, you're not allowed to use meow");
     return;
   }
 
