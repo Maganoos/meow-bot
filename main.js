@@ -2,8 +2,6 @@ import { Client } from 'discord.js-selfbot-v13';
 import axios from 'axios';
 import { create, all } from 'mathjs';
 
-const BANNED_IDS = process.env.BANNED_IDS.split(",");
-const BANNED_NAMES = process.env.BANNED_NAMES.split(",");
 const CHANNEL_IDS = process.env.CHANNEL_IDS.split(",");
 
 const client = new Client();
@@ -189,7 +187,7 @@ client.on('messageCreate', async (msg) => {
   if (msg.author.id === client.user.id)
     return;
 
-  if (BANNED_IDS.includes(msg.author.id) || BANNED_NAMES.includes(msg.author.displayName)){
+  if (process.env.BANNED_IDS.split(",").includes(msg.author.id) || process.env.BANNED_NAMES.includes(msg.author.displayName)){
     msg.reply("nuh uh, you're not allowed to use meow");
     return;
   }
