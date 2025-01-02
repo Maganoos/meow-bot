@@ -2,9 +2,9 @@ import { Client } from 'discord.js-selfbot-v13';
 import axios from 'axios';
 import { create, all } from 'mathjs';
 
-const BANNED_IDS = ['1116009825042702366'];
-const BANNED_NAMES = ['Rubuhhhh'];
-const CHANNEL_IDS = ['782651599926984704', '1286362396213903442'];
+const BANNED_IDS = process.env.BANNED_IDS;
+const BANNED_NAMES = process.env.BANNED_NAMES;
+const CHANNEL_IDS = process.env.CHANNEL_IDS;
 
 const client = new Client();
 const math = create(all, {functions: ['add', 'subtract', 'multiply', 'divide', 'pow', 'sqrt'], unsafe: false});
