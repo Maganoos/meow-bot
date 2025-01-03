@@ -3,7 +3,7 @@ import axios from 'axios';
 import { create, all } from 'mathjs';
 
 const CHANNEL_IDS = process.env.CHANNEL_IDS.split(",");
-const BANNED_PHRASES = process.env.BANNED_PHRASED.split(',');
+const BANNED_PHRASES = process.env.BANNED_PHRASES.split(',');
 
 const client = new Client();
 const math = create(all, {functions: ['add', 'subtract', 'multiply', 'divide', 'pow', 'sqrt'], unsafe: false});
