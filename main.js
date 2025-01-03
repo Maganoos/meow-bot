@@ -193,7 +193,7 @@ client.on('messageCreate', async (msg) => {
     return;
   }
 
-  if (BANNED_PHRASES.some(phrase => messageContent.includes(phrase))) {
+  if (BANNED_PHRASES.some(phrase => messageContent.includes(phrase)) || msg.mentions > 5 || messageContent.length() > 50) {
     await msg.reply("Jump. Like actually");
     return;
   }
