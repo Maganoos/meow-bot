@@ -193,10 +193,14 @@ client.on('messageCreate', async (msg) => {
     return;
   }
 
-  if (BANNED_PHRASES.some(phrase => messageContent.includes(phrase)) || msg.mentions > 5 || messageContent.length > 50) {
-    await msg.reply("Jump. Like actually");
+  if (
+    BANNED_PHRASES.some(phrase => messageContent.includes(phrase)) || 
+    (msg.mentions?.length > 5) || 
+    (messageContent?.length > 50)
+) {
+    await msg.reply("Jump. Like actually vro.");
     return;
-  }
+}
 
   const commandActions = {
     "avatar": executeAvatarCommand,
