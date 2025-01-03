@@ -3,6 +3,7 @@ import axios from 'axios';
 import { create, all } from 'mathjs';
 
 const CHANNEL_IDS = process.env.CHANNEL_IDS.split(",");
+const BANNED_PHRASES = process.env.BANNED_PHRASED.split(',');
 
 const client = new Client();
 const math = create(all, {functions: ['add', 'subtract', 'multiply', 'divide', 'pow', 'sqrt'], unsafe: false});
@@ -188,7 +189,12 @@ client.on('messageCreate', async (msg) => {
     return;
 
   if (process.env.BANNED_IDS.split(",").includes(msg.author.id) || process.env.BANNED_NAMES.includes(msg.author.displayName)){
-    msg.reply("nuh uh, you're not allowed to use meow");
+    await msg.reply("nuh uh, you're not allowed to use meow");
+    return;
+  }
+
+  if (BANNED_PHRASES.some(phrase => messageContent.includes(phrase))) {
+    await msg.reply("Jump. Like actually");
     return;
   }
 
