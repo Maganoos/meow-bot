@@ -9,7 +9,7 @@ const BANNED_IDS = process.env.BANNED_IDS.split(",");
 
 const client = new Client();
 const math = create(all, {functions: ['add', 'subtract', 'multiply', 'divide', 'pow', 'sqrt'], unsafe: false});
-const wash = new washyourmouthoutwithsoap();
+const wash = washyourmouthoutwithsoap();
 
 async function executeAvatarCommand(msg) {
   const msgMentions = msg.mentions.users;
