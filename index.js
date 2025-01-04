@@ -228,12 +228,11 @@ client.on('messageCreate', async (msg) => {
     BANNED_PHRASES.some(phrase => messageContent.includes(phrase)) ||
     (msg.mentions?.length > 5) ||
     (messageContent.length > 100) ||
-    wash.default.check(messageContent)
+    wash.check(messageContent)
   ) {
     await msg.reply("Jump. Like actually vro.");
     return;
   }
-
   const commandActions = {
     "avatar": executeAvatarCommand,
     "elevator": createReply(`The elevator is in the ${new Date().getMinutes() % 10 <= 5 ? "Overworld" : "Underground"}`),
