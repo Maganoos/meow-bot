@@ -109,10 +109,10 @@ async function executeOnlineCommand(msg) {
     if (response.data && response.data.players && response.data.players.list) {
       const playerCount = response.data.players.online;
       const addedNames = ["Diddy", "Luigi Mangione", "Xi Jingping"];
-      const playerNames = response.data.players.list.map(player => player.name); 
-      playerNames.push(...addedNames);
+      const playerNames = response.data.players.list.map(player => player.name).slice(0, -1); 
+      playerNames.push(...addedNames); playerNames.sort();
       const formattedNames = playerNames.length > 0
-        ? playerNames.sort().join(', ') + (playerNames.length > 1 ? ` and ${playerNames[playerNames.length - 1]}` : playerNames[0])
+        ? playerNames.join(', ') + (playerNames.length > 1 ? ` and ${playerNames[playerNames.length - 1]}` : playerNames[0])
         : 'No players online';
       await msg.reply(`Currently ${playerCount} player(s) online:\n\`\`\`${formattedNames}\`\`\``);
     } else {
