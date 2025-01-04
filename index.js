@@ -228,7 +228,7 @@ client.on('messageCreate', async (msg) => {
     BANNED_PHRASES.some(phrase => messageContent.includes(phrase)) ||
     (msg.mentions?.length > 5) ||
     (messageContent.length > 100) ||
-    wash.check(messageContent)
+    wash.default.check("en", messageContent)
   ) {
     await msg.reply("Jump. Like actually vro.");
     return;
