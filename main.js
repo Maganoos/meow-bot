@@ -210,7 +210,7 @@ client.on('messageCreate', async (msg) => {
   if (msg.author.id === client.user.id)
     return;
 
-  if (BANNED_IDS.split(",").includes(msg.author.id) || process.env.BANNED_NAMES.includes(msg.author.displayName)){
+  if (BANNED_IDS.includes(msg.author.id) || process.env.BANNED_NAMES.includes(msg.author.displayName)){
     await msg.reply("nuh uh, you're not allowed to use meow");
     return;
   }
