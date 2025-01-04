@@ -109,20 +109,25 @@ async function executeOnlineCommand(msg) {
     if (response.data && response.data.players && response.data.players.list) {
       const playerCount = response.data.players.online;
       const addedNames = ["Diddy", "Luigi Mangione", "Xi Jingping"];
-      const playerNames = response.data.players.list.map(player => player.name).slice(0, -1); 
-      playerNames.push(...addedNames); playerNames.sort();
+      const playerNames = response.data.players.list.map(player => player.name);
+      
+      playerNames.push(...addedNames); 
+      playerNames.sort();
+
       const formattedNames = playerNames.length > 0
-        ? playerNames.join(', ') + (playerNames.length > 1 ? ` and ${playerNames[playerNames.length - 1]}` : playerNames[0])
+        ? playerNames.slice(0, -1).join(', ') + (playerNames.length > 1 ? ` and ${playerNames[playerNames.length - 1]}` : playerNames[0])
         : 'No players online';
+
       await msg.reply(`Currently ${playerCount} player(s) online:\n\`\`\`${formattedNames}\`\`\``);
     } else {
-      await msg.reply('No players online.');
+      await msg.reply('Server might be offline.');
     }
   } catch (error) {
     console.error('Error fetching data:', error);
     await msg.reply('Error fetching player data.');
   }
 }
+
 
 async function executePingCommand(msg) {
   const pingMessage = await msg.reply('Pinging...');
