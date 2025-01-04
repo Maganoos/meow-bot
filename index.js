@@ -1,7 +1,7 @@
 import { Client } from 'discord.js-selfbot-v13';
 import axios from 'axios';
 import { create, all } from 'mathjs';
-import washyourmouthoutwithsoap from 'washyourmouthoutwithsoap';
+const wash = await import('washyourmouthoutwithsoap')
 
 const CHANNEL_IDS = process.env.CHANNEL_IDS.split(",");
 const BANNED_PHRASES = process.env.BANNED_PHRASES.split(',');
@@ -9,7 +9,6 @@ const BANNED_IDS = process.env.BANNED_IDS.split(",");
 
 const client = new Client();
 const math = create(all, {functions: ['add', 'subtract', 'multiply', 'divide', 'pow', 'sqrt'], unsafe: false});
-const wash = washyourmouthoutwithsoap();
 
 async function executeAvatarCommand(msg) {
   const msgMentions = msg.mentions.users;
@@ -229,7 +228,7 @@ client.on('messageCreate', async (msg) => {
     BANNED_PHRASES.some(phrase => messageContent.includes(phrase)) ||
     (msg.mentions?.length > 5) ||
     (messageContent.length > 100) ||
-    wash.check(messageContent)
+    wash.default.check(messageContent)
   ) {
     await msg.reply("Jump. Like actually vro.");
     return;
