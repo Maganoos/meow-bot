@@ -145,7 +145,8 @@ async function executeSkinCommand(msg) {
 
   try {
     const profileResponse = await axios.get(`https://api.mojang.com/users/profiles/minecraft/${username}`);
-    if (!profileResponse.data) {
+    
+    if (profileResponse.status === 404|| !profileResponse.data) {
       await msg.reply(`User ${username} not found.`);
       return;
     }
@@ -170,14 +171,16 @@ async function executeSkinCommand(msg) {
     await msg.reply(`Here is the skin for:\n[${correctUsername}](${skinUrl})\n[Render](https://starlightskins.lunareclipse.studio/render/mojavatar/${uuid}/full)`);
   } catch (error) {
     console.error('Error fetching skin:', error);
-    if (error.response) {
+    if (error.response && error.response.status === 404) {
+      await msg.reply(`User ${username} not found.`);
+    } else if (error.response) {
       await msg.reply(`There was an issue with the API: ${error.response.status} ${error.response.statusText}`);
     } else {
       await msg.reply('Sorry, there was an error fetching the skin.');
     }
   }
-  
 }
+
 
 async function executeUnlobotomizeCommand(msg) {
   if (!msg.reference) {
