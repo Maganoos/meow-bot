@@ -4,6 +4,7 @@ import { create, all } from 'mathjs';
 
 const CHANNEL_IDS = process.env.CHANNEL_IDS.split(",");
 const BANNED_PHRASES = process.env.BANNED_PHRASES.split(',');
+const BANNED_IDS = process.env.BANNED_IDS.split(",");
 
 const client = new Client();
 const math = create(all, {functions: ['add', 'subtract', 'multiply', 'divide', 'pow', 'sqrt'], unsafe: false});
@@ -34,10 +35,22 @@ async function executeGuacCommand(msg) {
 }
 
 async function executeHowCommands(msg) {
-  let command = msg.content.replace(/meow, how/i, '').replace(/[?!.,;]$/, '').trim().split(/\s+/);
-  command = command.filter(word => word.toLowerCase() !== 'is');
-  if (command.length < 2) {await msg.reply('who?'); return};
-  await msg.reply(`${command.splice(1).join(' ')} is ${Math.floor(Math.random() * 100)}% ${command[0]}`);
+  const command = msg.content
+    .replace(/meow, how/i, '')
+    .replace(/[?!.,;]/g, '')
+    .trim()
+    .split(/\b is \b/i)
+    .filter(word => word.trim() !== '');
+
+  if (command.length < 2) {
+      msg.reply('who?');
+      return;
+  }
+
+  const subject = command[command.length - 1].trim();
+  const description = command.slice(0, command.length - 1).join(' is ').trim();
+
+  msg.reply(`${subject} is ${Math.floor(Math.random() * 100)}% ${description}`);
 }
 
 async function executeKillCommand(msg) {
@@ -95,9 +108,11 @@ async function executeOnlineCommand(msg) {
     const response = await axios.get('https://api.mcsrvstat.us/3/play.alinea.gg');
     if (response.data && response.data.players && response.data.players.list) {
       const playerCount = response.data.players.online;
-      const playerNames = response.data.players.list.map(player => player.name);
+      const addedNames = ["Diddy", "Luigi Mangione", "Xi Jingping"];
+      const playerNames = response.data.players.list.map(player => player.name); 
+      playerNames.push(...addedNames);
       const formattedNames = playerNames.length > 0
-        ? playerNames.slice(0, -1).join(', ') + (playerNames.length > 1 ? ` and ${playerNames[playerNames.length - 1]}` : playerNames[0])
+        ? playerNames.sort().join(', ') + (playerNames.length > 1 ? ` and ${playerNames[playerNames.length - 1]}` : playerNames[0])
         : 'No players online';
       await msg.reply(`Currently ${playerCount} player(s) online:\n\`\`\`${formattedNames}\`\`\``);
     } else {
@@ -131,7 +146,8 @@ async function executeSkinCommand(msg) {
   try {
     const profileResponse = await axios.get(`https://api.mojang.com/users/profiles/minecraft/${username}`);
     if (!profileResponse.data) {
-      return await msg.reply(`User ${username} not found.`);
+      await msg.reply(`User ${username} not found.`);
+      return;
     }
 
     const correctUsername = profileResponse.data.name;
@@ -144,7 +160,8 @@ async function executeSkinCommand(msg) {
 
     const skinData = skinResponse.data.properties.find(prop => prop.name === 'textures');
     if (!skinData) {
-      return await msg.reply(`No skin found for ${correctUsername}.`);
+      await msg.reply(`No skin found for ${correctUsername}.`);
+      return;
     }
 
     const skinJson = JSON.parse(Buffer.from(skinData.value, 'base64').toString('utf-8'));
@@ -153,8 +170,13 @@ async function executeSkinCommand(msg) {
     await msg.reply(`Here is the skin for:\n[${correctUsername}](${skinUrl})\n[Render](https://starlightskins.lunareclipse.studio/render/mojavatar/${uuid}/full)`);
   } catch (error) {
     console.error('Error fetching skin:', error);
-    await msg.reply('Sorry, there was an error fetching the skin.');
+    if (error.response) {
+      await msg.reply(`There was an issue with the API: ${error.response.status} ${error.response.statusText}`);
+    } else {
+      await msg.reply('Sorry, there was an error fetching the skin.');
+    }
   }
+  
 }
 
 async function executeUnlobotomizeCommand(msg) {
@@ -177,10 +199,10 @@ client.once('ready', () => {
 });
 
 client.on('messageCreate', async (msg) => {
+  const messageContent = msg.content.toLowerCase();
+
   if (!CHANNEL_IDS.includes(msg.channel.id))
     return;
-
-  const messageContent = msg.content.toLowerCase();
 
   if (!messageContent.startsWith('meow,'))
     return;
@@ -188,19 +210,16 @@ client.on('messageCreate', async (msg) => {
   if (msg.author.id === client.user.id)
     return;
 
-  if (process.env.BANNED_IDS.split(",").includes(msg.author.id) || process.env.BANNED_NAMES.includes(msg.author.displayName)){
+  if (BANNED_IDS.split(",").includes(msg.author.id) || process.env.BANNED_NAMES.includes(msg.author.displayName)){
     await msg.reply("nuh uh, you're not allowed to use meow");
     return;
   }
 
   if (
-    BANNED_PHRASES.some(phrase => messageContent.includes(phrase)) || 
-    (msg.mentions?.length > 5) || 
-    (messageContent?.length > 50)
-) {
+    BANNED_PHRASES.some(phrase => messageContent.includes(phrase)) || (msg.mentions?.length > 5) || (messageContent?.length > 100)) {
     await msg.reply("Jump. Like actually vro.");
     return;
-}
+  }
 
   const commandActions = {
     "avatar": executeAvatarCommand,
