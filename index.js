@@ -1,7 +1,7 @@
 import { Client } from 'discord.js-selfbot-v13';
 import axios from 'axios';
 import { create, all } from 'mathjs';
-import washYourMouthOutWithSoap from 'washyourmouthoutwithsoap';
+import washyourmouthoutwithsoap from 'washyourmouthoutwithsoap';
 
 const CHANNEL_IDS = process.env.CHANNEL_IDS.split(",");
 const BANNED_PHRASES = process.env.BANNED_PHRASES.split(',');
@@ -9,7 +9,7 @@ const BANNED_IDS = process.env.BANNED_IDS.split(",");
 
 const client = new Client();
 const math = create(all, {functions: ['add', 'subtract', 'multiply', 'divide', 'pow', 'sqrt'], unsafe: false});
-const wash = new washYourMouthOutWithSoap();
+const wash = new washyourmouthoutwithsoap;
 
 async function executeAvatarCommand(msg) {
   const msgMentions = msg.mentions.users;
