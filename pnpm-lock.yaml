@@ -17,6 +17,9 @@ importers:
       mathjs:
         specifier: latest
         version: 14.0.1
+      washyourmouthoutwithsoap:
+        specifier: ^1.0.2
+        version: 1.0.2
 
 packages:
 
@@ -324,6 +327,9 @@ packages:
   url-parse@1.5.10:
     resolution: {integrity: sha512-WypcfiRhfeUP9vvF0j6rw0J3hrWrw6iZv3+22h6iRMJ/8z1Tj6XfLP4DsUix5MhMPnXpiHDoKyoZ/bdCkwBCiQ==}
 
+  washyourmouthoutwithsoap@1.0.2:
+    resolution: {integrity: sha512-N008S6j3VoPgjUwvW1Q2roTYg9Xuy1LfR/R4BdjddhzM8YBNgIR4FpSQ9zVmNkvpi/fS9cfAQLSjWKXE3wQ1zA==}
+
   which-module@2.0.1:
     resolution: {integrity: sha512-iBdZ57RDvnOR9AGBhML2vFZf7h8vmBjhoaZqODJBFWHVtKkDmKuHai3cx5PgVMrX5YDNp27AofYbAwctSS+vhQ==}
 
@@ -626,6 +632,8 @@ snapshots:
     dependencies:
       querystringify: 2.2.0
       requires-port: 1.0.0
+
+  washyourmouthoutwithsoap@1.0.2: {}
 
   which-module@2.0.1: {}
 
