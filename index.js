@@ -1,7 +1,7 @@
 import { Client } from 'discord.js-selfbot-v13';
 import axios from 'axios';
 import { create, all } from 'mathjs';
-import { washyourmouthoutwithsoap } from 'washyourmouthoutwithsoap';
+import washyourmouthoutwithsoap from 'washyourmouthoutwithsoap';
 
 const CHANNEL_IDS = process.env.CHANNEL_IDS.split(",");
 const BANNED_PHRASES = process.env.BANNED_PHRASES.split(',');
