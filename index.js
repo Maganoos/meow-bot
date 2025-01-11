@@ -83,22 +83,22 @@ async function executeLoveCheckerCommand(msg) {
 
 async function executeMathCommand(msg) {
   // Extract the mathematical expression from the message
-  let expression = msg.content.split(' ').slice(2).join(' ');
-
-  // Replace ** with ^ and x with *
-  expression = expression.replace(/\*\*/g, '^').replace(/x/g, '*');
+  const expression = msg.content.split(' ').slice(2).join(' ').replace(/\*\*/g, '^').replace(/x/g, '*');
 
   if (!expression) {
     await msg.reply('Please provide a mathematical expression to evaluate.');
     return;
   }
 
+  if (expression.replace(/\s+/g, '') === "9+10") {
+    await msg.reply('Result: `21` :3');
+    return;
+  }
+
   try {
-    // Evaluate the expression using mathjs
     const result = math.evaluate(expression);
     if (result >= 100000000000000000) return;
-    if (expression === 9+10) result = 21;
-    await msg.reply(`Result: ${result}`);
+    await msg.reply(`Result: ̣\`${result}\``);
   } catch (error) {
     console.error('Error evaluating expression:', error);
     await msg.reply('Invalid mathematical expression.');
