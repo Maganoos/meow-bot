@@ -97,6 +97,7 @@ async function executeMathCommand(msg) {
     // Evaluate the expression using mathjs
     const result = math.evaluate(expression);
     if (result >= 100000000000000000) return;
+    if (expression === 9+10) result = 21;
     await msg.reply(`Result: ${result}`);
   } catch (error) {
     console.error('Error evaluating expression:', error);
@@ -113,7 +114,7 @@ async function executeOnlineCommand(msg) {
       const playerNames = response.data.players.list.map(player => player.name);
       
       playerNames.push(...addedNames); 
-      playerNames.sort();
+      playerNames.sort(function (a, b) {return a.localeCompare(b)});
 
       const formattedNames = playerNames.length > 0
         ? playerNames.slice(0, -1).join(', ') + (playerNames.length > 1 ? ` and ${playerNames[playerNames.length - 1]}` : playerNames[0])
@@ -235,6 +236,7 @@ client.on('messageCreate', async (msg) => {
   }
   const commandActions = {
     "avatar": executeAvatarCommand,
+    "brutally murder": executeKillCommand,  
     "elevator": createReply(`The elevator is in the ${new Date().getMinutes() % 10 <= 5 ? "Overworld" : "Underground"}`),
     "guac": executeGuacCommand,
     "how": executeHowCommands,
@@ -242,6 +244,7 @@ client.on('messageCreate', async (msg) => {
     "lobotomize": executeLobotomizeCommand,
     "lovechecker": executeLoveCheckerCommand,
     "math": executeMathCommand,
+    "murder": executeKillCommand,
     "online": executeOnlineCommand,
     "ping": executePingCommand,
     "pingforme": executePingForMeCommand,
