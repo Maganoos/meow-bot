@@ -171,11 +171,16 @@ async function executeSkinCommand(msg) {
 
 function createReply(replyText) {
   return async function(msg) {
-    if (!msg.reference) {
-      await msg.reply(replyText);
-    } else {
-      const referencedMessage = await msg.fetchReference();
-      await referencedMessage.reply(replyText);
+    try {
+      if (!msg.reference) {
+        await msg.reply(replyText);
+      } else {
+        const referencedMessage = await msg.fetchReference();
+        await referencedMessage.reply(replyText);
+      }
+    } catch (error) {
+      console.error("erm wattesigma", error)
+      await msg.reply("oops")
     }
   };
 }
