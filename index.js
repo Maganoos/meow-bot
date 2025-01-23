@@ -101,9 +101,9 @@ async function executeOnlineCommand(msg) {
         ? playerNames.slice(0, -1).join(', ') + (playerNames.length > 1 ? ` and ${playerNames[playerNames.length - 1]}` : playerNames[0])
         : 'No players online';
 
-      await msg.reply(`Currently ${playerCount} player(s) online:\n\`\`\`${formattedNames}\`\`\``);
+      await msg.reply(`Currently ${playerCount} ${playerCount > 1 ? "players" : "player"} online:\n\`\`\`${formattedNames}\`\`\``);
     } else {
-      await msg.reply('Server might be offline.');
+      await msg.reply('Server offline/no players online');
     }
   } catch (error) {
     console.error('Error fetching data:', error);
@@ -128,7 +128,7 @@ async function executePurgeCommand(msg) {
     for (const message of messages.values()) {
       await message.delete();
     }
-    msg.reply(`Deleted ${messages.size} messages sent by ${client.user.name}`)
+    msg.reply(`Deleted ${messages.size} messages sent by ${client.user.username}`)
   } catch (error) {
     console.error('Error occurred while purging messages:', error);
   }
