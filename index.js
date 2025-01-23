@@ -51,25 +51,7 @@ async function executeHowCommands(msg) {
   const subject = command[command.length - 1].trim();
   const description = command.slice(0, command.length - 1).join(' is ').trim();
 
-  msg.reply(`${subject} is ${Math.floor(Math.random() * 100)}% ${description}`);
-}
-
-async function executeKillCommand(msg) {
-  if (!msg.reference) {
-    await msg.reply("🔫💨");
-  } else {
-    const referencedMessage = await msg.fetchReference();
-    await referencedMessage.reply("🔫💨");
-  }
-}
-
-async function executeLobotomizeCommand(msg) {
-  if (!msg.reference) {
-    await msg.reply("🧠🔨");
-  } else {
-    const referencedMessage = await msg.fetchReference();
-    await referencedMessage.reply("🧠🔨");
-  }
+  msg.reply(`${subject} is ${Math.floor(Math.random() * 101)}% ${description}`);
 }
 
 async function executeLoveCheckerCommand(msg) {
@@ -98,7 +80,7 @@ async function executeMathCommand(msg) {
   try {
     const result = math.evaluate(expression);
     if (result >= 100000000000000000) return;
-    await msg.reply(`Result: ̣\`${result}\``);
+    await msg.reply(`Result: \`${result}\``);
   } catch (error) {
     console.error('Error evaluating expression:', error);
     await msg.reply('Invalid mathematical expression.');
@@ -110,10 +92,9 @@ async function executeOnlineCommand(msg) {
     const response = await axios.get('https://api.mcsrvstat.us/3/play.alinea.gg');
     if (response.data && response.data.players && response.data.players.list) {
       const playerCount = response.data.players.online;
-      const addedNames = ["Diddy", "Luigi Mangione", "Xi Jingping"];
       const playerNames = response.data.players.list.map(player => player.name);
       
-      playerNames.push(...addedNames); 
+      playerNames.push(...["Diddy", "Luigi Mangione", "Xi Jingping"]); 
       playerNames.sort(function (a, b) {return a.localeCompare(b)});
 
       const formattedNames = playerNames.length > 0
@@ -188,19 +169,14 @@ async function executeSkinCommand(msg) {
   }
 }
 
-
-async function executeUnlobotomizeCommand(msg) {
-  if (!msg.reference) {
-    await msg.reply("🧠🤕");
-  } else {
-    const referencedMessage = await msg.fetchReference();
-    await referencedMessage.reply("🧠🤕");
-  }
-}
-
 function createReply(replyText) {
   return async function(msg) {
-    await msg.reply(replyText);
+    if (!msg.reference) {
+      await msg.reply(replyText);
+    } else {
+      const referencedMessage = await msg.fetchReference();
+      await referencedMessage.reply(replyText);
+    }
   };
 }
 
@@ -231,26 +207,28 @@ client.on('messageCreate', async (msg) => {
     (messageContent.length > 100) ||
     wash.default.check("en", messageContent.replace(/[^A-Za-z0-9\s]/g, ''))
   ) {
-    await msg.reply("Jump. Like actually vro.");
+    await msg.reply("Nope");
     return;
   }
   const commandActions = {
     "avatar": executeAvatarCommand,
-    "brutally murder": executeKillCommand,  
+    "brutally murder": createReply("🔫💨"),  
     "elevator": createReply(`The elevator is in the ${new Date().getMinutes() % 10 <= 5 ? "Overworld" : "Underground"}`),
     "guac": executeGuacCommand,
     "how": executeHowCommands,
-    "kill": executeKillCommand,
-    "lobotomize": executeLobotomizeCommand,
+    "kill": createReply("🔫💨"),
+    "lobotomize": createReply("🧠🔨"),
     "lovechecker": executeLoveCheckerCommand,
     "math": executeMathCommand,
-    "murder": executeKillCommand,
+    "murder": createReply("🔫💨"),
     "online": executeOnlineCommand,
     "ping": executePingCommand,
     "pingforme": executePingForMeCommand,
     "repo": createReply("https://github.com/Maganoos/meow-bot"),
+    "1-100": createReply(Math.floor(Math.random() * 101)),
     "skin": executeSkinCommand,
-    "unlobotomize": executeUnlobotomizeCommand,
+    "unlobotomize": createReply("🧠🤕"),
+    "yes or no": createReply(Math.floor(Math.random() * 2) == 0 ? "Yes" : "No"),
     "what is the meaning of life": createReply("being silly"),
     "who is the most sigma out of all people on earth": createReply("It is I, meow the third of meowington"),
   };
