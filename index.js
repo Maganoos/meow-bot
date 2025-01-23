@@ -118,9 +118,22 @@ async function executePingCommand(msg) {
   await pingMessage.edit(`Pong! Latency: ${latency}ms`);
 }
 
-async function executePingForMeCommand(msg) {
-  msg.reply(`Boop! :3 <@${msg.content.split(' ').slice(2)[0]}>`)
+async function executePurgeCommand(msg) {
+  if (msg.author.id !== '885157323880935474' && (msg.author.id !== '1050780466137026671' && msg.author.displayName !== 'Maganoos')) return;
+
+  try {
+    let messages = await msg.channel.messages.fetch({ limit: 50 });
+    messages = messages.filter(message => message.author.id === client.user.id);
+
+    for (const message of messages.values()) {
+      await message.delete();
+    }
+    msg.reply(`Deleted ${messages.size} messages sent by ${client.user.name}`)
+  } catch (error) {
+    console.error('Error occurred while purging messages:', error);
+  }
 }
+
 
 async function executeSkinCommand(msg) {
   const args = msg.content.split(' ');
@@ -228,7 +241,7 @@ client.on('messageCreate', async (msg) => {
     "murder": createReply("🔫💨"),
     "online": executeOnlineCommand,
     "ping": executePingCommand,
-    "pingforme": executePingForMeCommand,
+    "purge": executePurgeCommand,
     "repo": createReply("https://github.com/Maganoos/meow-bot"),
     "1-100": createReply(String(Math.floor(Math.random() * 101))),
     "skin": executeSkinCommand,
