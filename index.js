@@ -225,7 +225,7 @@ client.on('messageCreate', async (msg) => {
     "ping": executePingCommand,
     "pingforme": executePingForMeCommand,
     "repo": createReply("https://github.com/Maganoos/meow-bot"),
-    "1-100": createReply(() => Math.floor(Math.random() * 101)+""),
+    "1-100": createReply(String(Math.floor(Math.random() * 101))),
     "skin": executeSkinCommand,
     "unlobotomize": createReply("🧠🤕"),
     "yes or no": createReply(Math.floor(Math.random() * 2) == 0 ? "Yes" : "No"),
