@@ -1,236 +1,127 @@
 import { Client } from 'discord.js-selfbot-v13';
 import axios from 'axios';
 import { create, all } from 'mathjs';
-const wash = await import('washyourmouthoutwithsoap')
+const wash = await import('washyourmouthoutwithsoap');
 
-const CHANNEL_IDS = process.env.CHANNEL_IDS.split(",");
-const BANNED_PHRASES = process.env.BANNED_PHRASES.split(',');
-const BANNED_IDS = process.env.BANNED_IDS.split(",");
-
+const { CHANNEL_IDS, BANNED_PHRASES, BANNED_IDS, BANNED_NAMES, TOKEN } = process.env;
 const client = new Client();
-const math = create(all, {functions: ['add', 'subtract', 'multiply', 'divide', 'pow', 'sqrt'], unsafe: false});
+const math = create(all, {unsafe: false });
 
-async function executeAvatarCommand(msg) {
+const splitEnvVar = (envVar) => envVar.split(',');
+
+const executeAvatarCommand = async (msg) => {
   const msgMentions = msg.mentions.users;
-  if (msgMentions.size <= 0) {await msg.reply('who?'); return;}
+  if (msgMentions.size <= 0) return msg.reply('who?');
   let response = msgMentions.size > 1 ? 'Here are the avatars:' : 'Here is the avatar for:';
-
   msgMentions.forEach(user => response += `\n[${user.username}](${user.displayAvatarURL()}?size=4096)`);
-
   await msg.reply(response);
-}
+};
 
-async function executeGuacCommand(msg) {
+const executeGuacCommand = async (msg) => {
   try {
-    const response = await fetch('https://www.eepy.monster/api/images');
-    const data = await response.json();
-    const maxImages = data.images;
-
+    const { data: { images: maxImages } } = await axios.get('https://www.eepy.monster/api/images');
     const randomNumber = Math.floor(Math.random() * maxImages) + 1;
-
     await msg.reply(`https://cdn.eepy.monster/guac${randomNumber}.jpg`);
-
   } catch (error) {
     console.error('Error fetching image:', error);
   }
-}
+};
 
-async function executeHowCommands(msg) {
-  const command = msg.content
-    .replace(/meow, how/i, '')
-    .replace(/[?!.,;]/g, '')
-    .trim()
-    .split(/\b is \b/i)
-    .filter(word => word.trim() !== '');
-
-  if (command.length < 2) {
-      msg.reply('who?');
-      return;
-  }
-
-  const subject = command[command.length - 1].trim();
-  const description = command.slice(0, command.length - 1).join(' is ').trim();
-
+const executeHowCommands = async (msg) => {
+  const command = msg.content.replace(/meow, how/i, '').replace(/[?!.,;]/g, '').trim().split(/\b is \b/i).filter(word => word.trim() !== '');
+  if (command.length < 2) return msg.reply('who?');
+  const [description, subject] = [command.slice(0, -1).join(' is ').trim(), command[command.length - 1].trim()];
   msg.reply(`${subject} is ${Math.floor(Math.random() * 101)}% ${description}`);
-}
+};
 
-async function executeLoveCheckerCommand(msg) {
-  let people = msg.content.split(' ').slice(2).filter(word => word.toLowerCase() !== 'and');
-  if (people.length < 2) {
-    await msg.reply('Please provide at least two people to check love for.');
-    return;
-  }
-  await msg.reply(`The love between ${people.join(' and ')} is ${Math.floor(Math.random() * 100)}%`);
-}
+const executeLoveCheckerCommand = async (msg) => {
+  const people = msg.content.split(' ').slice(2).filter(word => word.toLowerCase() !== 'and');
+  if (people.length < 2) return msg.reply('Please provide at least two people to check love for.');
+  msg.reply(`The love between ${people.join(' and ')} is ${Math.floor(Math.random() * 100)}%`);
+};
 
-async function executeMathCommand(msg) {
-  // Extract the mathematical expression from the message
+const executeMathCommand = async (msg) => {
   const expression = msg.content.split(' ').slice(2).join(' ').replace(/\*\*/g, '^').replace(/x/g, '*');
-
-  if (!expression) {
-    await msg.reply('Please provide a mathematical expression to evaluate.');
-    return;
-  }
-
-  if (expression.replace(/\s+/g, '') === "9+10") {
-    await msg.reply('Result: `21` :3');
-    return;
-  }
-
+  if (!expression) return msg.reply('Please provide a mathematical expression to evaluate.');
+  if (expression.replace(/\s+/g, '') === "9+10") return msg.reply('Result: `21` :3');
   try {
     const result = math.evaluate(expression);
-    if (result >= 100000000000000000) return;
-    await msg.reply(`Result: \`${result}\``);
+    if (result < 100000000000000000) await msg.reply(`Result: \`${result}\``);
   } catch (error) {
     console.error('Error evaluating expression:', error);
-    await msg.reply('Invalid mathematical expression.');
+    msg.reply('Invalid mathematical expression.');
   }
-}
+};
 
-async function executeOnlineCommand(msg) {
+const executeOnlineCommand = async (msg) => {
   try {
-    const response = await axios.get('https://api.mcsrvstat.us/3/play.alinea.gg');
-    if (response.data && response.data.players && response.data.players.list) {
-      const playerCount = response.data.players.online;
-      const playerNames = response.data.players.list.map(player => player.name);
-      
-      playerNames.push(...["Diddy", "Luigi Mangione", "Xi Jingping"]); 
-      playerNames.sort(function (a, b) {return a.localeCompare(b)});
-
-      const formattedNames = playerNames.length > 0
-        ? playerNames.slice(0, -1).join(', ') + (playerNames.length > 1 ? ` and ${playerNames[playerNames.length - 1]}` : playerNames[0])
-        : 'No players online';
-
-      await msg.reply(`Currently ${playerCount} ${playerCount > 1 ? "players" : "player"} online:\n\`\`\`${formattedNames}\`\`\``);
-    } else {
-      await msg.reply('Server offline/no players online');
-    }
+    const { data: { players: { online: playerCount, list: playerNames = [] } = {} } = {} } = await axios.get('https://api.mcsrvstat.us/3/play.alinea.gg');
+    playerNames.push(...["Diddy", "Luigi Mangione", "Xi Jingping"]);
+    playerNames.sort((a, b) => a.localeCompare(b));
+    const formattedNames = playerNames.length > 0 ? playerNames.slice(0, -1).join(', ') + (playerNames.length > 1 ? ` and ${playerNames[playerNames.length - 1]}` : playerNames[0]) : 'No players online';
+    msg.reply(`Currently ${playerCount} ${playerCount > 1 ? "players" : "player"} online:\n\`\`\`${formattedNames}\`\`\``);
   } catch (error) {
     console.error('Error fetching data:', error);
-    await msg.reply('Error fetching player data.');
+    msg.reply('Error fetching player data.');
   }
-}
+};
 
-
-async function executePingCommand(msg) {
+const executePingCommand = async (msg) => {
   const pingMessage = await msg.reply('Pinging...');
   const latency = Math.round(client.ws.ping);
   await pingMessage.edit(`Pong! Latency: ${latency}ms`);
-}
+};
 
-async function executePurgeCommand(msg) {
-  if (msg.author.id !== '885157323880935474' && (msg.author.id !== '1050780466137026671' && msg.author.displayName !== 'Maganoos')) return;
-
+const executePurgeCommand = async (msg) => {
+  if (!['885157323880935474', '1050780466137026671'].includes(msg.author.id.toString()) && msg.author.displayName !== 'Maganoos') return;
   try {
     let messages = await msg.channel.messages.fetch({ limit: 50 });
     messages = messages.filter(message => message.author.id === client.user.id);
-
-    for (const message of messages.values()) {
-      await message.delete();
-    }
-    msg.reply(`Deleted ${messages.size} messages sent by ${client.user.username}`)
+    for (const message of messages.values()) await message.delete();
+    msg.reply(`Deleted ${messages.size} messages sent by ${client.user.username}`);
   } catch (error) {
     console.error('Error occurred while purging messages:', error);
   }
-}
+};
 
-
-async function executeSkinCommand(msg) {
+const executeSkinCommand = async (msg) => {
   const args = msg.content.split(' ');
-  if (args.length !== 3) {
-    await msg.reply('Please provide only one username.');
-    return;
-  }
-
+  if (args.length !== 3) return msg.reply('Please provide only one username.');
   const username = args[2];
-
   try {
-    const profileResponse = await axios.get(`https://api.mojang.com/users/profiles/minecraft/${username}`);
-    
-    if (profileResponse.status === 404|| !profileResponse.data) {
-      await msg.reply(`User ${username} not found.`);
-      return;
-    }
-
-    const correctUsername = profileResponse.data.name;
-    const uuid = profileResponse.data.id;
-    const skinResponse = await axios.get(`https://sessionserver.mojang.com/session/minecraft/profile/${uuid}`, {
-      headers: {
-        'Accept': 'application/json',
-      },
-    });
-
-    const skinData = skinResponse.data.properties.find(prop => prop.name === 'textures');
-    if (!skinData) {
-      await msg.reply(`No skin found for ${correctUsername}.`);
-      return;
-    }
-
-    const skinJson = JSON.parse(Buffer.from(skinData.value, 'base64').toString('utf-8'));
-    const skinUrl = skinJson.textures.SKIN.url;
-
-    await msg.reply(`Here is the skin for:\n[${correctUsername}](${skinUrl})\n[Render](https://starlightskins.lunareclipse.studio/render/mojavatar/${uuid}/full)`);
+    const { data: { name: correctUsername, id: uuid } } = await axios.get(`https://api.mojang.com/users/profiles/minecraft/${username}`);
+    const { data: { properties } } = await axios.get(`https://sessionserver.mojang.com/session/minecraft/profile/${uuid}`, { headers: { 'Accept': 'application/json' } });
+    const skinData = properties.find(prop => prop.name === 'textures');
+    if (!skinData) return msg.reply(`No skin found for ${correctUsername}.`);
+    const { textures: { SKIN: { url: skinUrl } } } = JSON.parse(Buffer.from(skinData.value, 'base64').toString('utf-8'));
+    msg.reply(`Here is the skin for:\n[${correctUsername}](${skinUrl})\n[Render](https://starlightskins.lunareclipse.studio/render/mojavatar/${uuid}/full)`);
   } catch (error) {
     console.error('Error fetching skin:', error);
-    if (error.response && error.response.status === 404) {
-      await msg.reply(`User ${username} not found.`);
-    } else if (error.response) {
-      await msg.reply(`There was an issue with the API: ${error.response.status} ${error.response.statusText}`);
-    } else {
-      await msg.reply('Sorry, there was an error fetching the skin.');
-    }
+    msg.reply(error.response?.status === 404 ? `User ${username} not found.` : `There was an issue with the API: ${error.response?.status} ${error.response?.statusText}`);
   }
-}
+};
 
-function createReply(replyText) {
-  return async function(msg) {
-    try {
-      if (!msg.reference) {
-        await msg.reply(replyText);
-      } else {
-        const referencedMessage = await msg.fetchReference();
-        await referencedMessage.reply(replyText);
-      }
-    } catch (error) {
-      console.error("erm wattesigma", error)
-      await msg.reply("oops")
-    }
-  };
-}
+const createReply = (replyText) => async (msg) => {
+  try {
+    const referencedMessage = msg.reference ? await msg.fetchReference() : null;
+    await (referencedMessage ? referencedMessage.reply(replyText) : msg.reply(replyText));
+  } catch (error) {
+    console.error("erm wattesigma", error);
+    msg.reply("oops");
+  }
+};
 
-client.once('ready', () => {
-  console.log(`${client.user.username} is ready!`);
-});
+client.once('ready', () => console.log(`${client.user.username} is ready!`));
 
 client.on('messageCreate', async (msg) => {
   const messageContent = msg.content.toLowerCase();
+  if (!splitEnvVar(CHANNEL_IDS).includes(msg.channel.id) || !messageContent.startsWith('meow,') || msg.author.id === client.user.id) return;
+  if (splitEnvVar(BANNED_IDS).includes(msg.author.id) || splitEnvVar(BANNED_NAMES).includes(msg.author.displayName)) return msg.reply("nuh uh, you're not allowed to use meow");
+  if (splitEnvVar(BANNED_PHRASES).some(phrase => messageContent.includes(phrase)) || (msg.mentions.length > 5) || (messageContent.length > 100) || wash.default.check("en", messageContent.replace(/[^A-Za-z0-9\s]/g, ''))) return msg.reply("Nope");
 
-  if (!CHANNEL_IDS.includes(msg.channel.id))
-    return;
-
-  if (!messageContent.startsWith('meow,'))
-    return;
-
-  if (msg.author.id === client.user.id)
-    return;
-
-  if (BANNED_IDS.includes(msg.author.id) || process.env.BANNED_NAMES.includes(msg.author.displayName)){
-    await msg.reply("nuh uh, you're not allowed to use meow");
-    return;
-  }
-
-  if (
-    BANNED_PHRASES.some(phrase => messageContent.includes(phrase)) ||
-    (msg.mentions?.length > 5) ||
-    (messageContent.length > 100) ||
-    wash.default.check("en", messageContent.replace(/[^A-Za-z0-9\s]/g, ''))
-  ) {
-    await msg.reply("Nope");
-    return;
-  }
   const commandActions = {
     "avatar": executeAvatarCommand,
-    "brutally murder": createReply("🔫💨"),  
+    "brutally murder": createReply("🔫💨"),
     "elevator": createReply(`The elevator is in the ${new Date().getMinutes() % 10 <= 5 ? "Overworld" : "Underground"}`),
     "guac": executeGuacCommand,
     "how": executeHowCommands,
@@ -246,22 +137,15 @@ client.on('messageCreate', async (msg) => {
     "1-100": createReply(String(Math.floor(Math.random() * 101))),
     "skin": executeSkinCommand,
     "unlobotomize": createReply("🧠🤕"),
-    "yes or no": createReply(Math.floor(Math.random() * 2) == 0 ? "Yes" : "No"),
+    "yes or no": createReply(Math.floor(Math.random() * 2) === 0 ? "Yes" : "No"),
     "what is the meaning of life": createReply("being silly"),
     "who is the most sigma out of all people on earth": createReply("It is I, meow the third of meowington"),
   };
+  commandActions["help"] = createReply(`Available commands: \`\`\`${Object.keys(commandActions).sort().join(', ')}\`\`\`\nUse \`meow, :command\` to execute`)
 
-  commandActions["help"] = createReply(`Available commands: \`\`\`${Object.keys(commandActions).sort().join(', ')}\`\`\`\nUse \`meow, :command\` to execute`);
-
-  const commandContent = messageContent.replace(/^(?:meow,\s*)/i, '')
-
-  const match = Object.entries(commandActions)
-    .find(([key]) => commandContent.startsWith(key));
-
-  if (match) {
-    const [_key, action] = match;
-    await action(msg);
-  } else msg.reply("huh?");
+  const commandContent = messageContent.replace(/^meow,\s/i, '');
+  const match = Object.entries(commandActions).find(([key]) => commandContent.startsWith(key));
+  if (match) await match[1](msg); else await msg.reply("huh?");
 });
 
-client.login(process.env.TOKEN);
+client.login(TOKEN);
