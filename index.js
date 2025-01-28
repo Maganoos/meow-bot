@@ -76,6 +76,17 @@ const executeOnlineCommand = async (msg) => {
   }
 };
 
+const executePingCommand = async (msg) => {
+  try {
+    const sentMessage = await msg.channel.send('Pinging...');
+    const latency = Date.now() - sentMessage.createdTimestamp;
+    const apiLatency = sentMessage.createdTimestamp - msg.createdTimestamp;
+    await sentMessage.edit(`Pong! Latency: ${latency}ms, API Latency: ${apiLatency}ms`);
+  } catch (error) {
+    console.error('Error sending ping response:', error);
+  }
+};
+
 const executePurgeCommand = async (msg) => {
   if (!['885157323880935474', '1050780466137026671'].includes(msg.author.id.toString()) && msg.author.displayName !== 'Maganoos') return;
   try {
