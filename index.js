@@ -58,15 +58,20 @@ const executeOnlineCommand = async (msg) => {
     const { data: { players: { online: playerCount, list: playerNames = [] } = {} } = {} } = await axios.get('https://api.mcsrvstat.us/3/play.alinea.gg');
     playerNames.push(...["Diddy", "Luigi Mangione", "Xi Jingping"]);
 
-  if (typeof name !== 'string') {
-    console.error(`Invalid entry at index ${index}:`, name);
-    await msg.reply(`Invalid entry at index ${index}:`, name)
-  }
-});
-playerNames = playerNames.filter(name => typeof name === 'string');
+    playerNames.forEach((name, index) => {
+      if (typeof name !== 'string') {
+        console.error(`Invalid entry at index ${index}:`, name);
+        msg.reply(`Invalid entry at index ${index}: ${name}`);
+      }
+    });
 
-    playerNames.sort((a, b) => a.localeCompare(b));
-    const formattedNames = playerNames.length > 0 ? playerNames.slice(0, -1).join(', ') + (playerNames.length > 1 ? ` and ${playerNames[playerNames.length - 1]}` : playerNames[0]) : 'No players online';
+    const validPlayerNames = playerNames.filter(name => typeof name === 'string');
+    validPlayerNames.sort((a, b) => a.localeCompare(b));
+
+    const formattedNames = validPlayerNames.length > 0 
+      ? validPlayerNames.slice(0, -1).join(', ') + (validPlayerNames.length > 1 ? ` and ${validPlayerNames[validPlayerNames.length - 1]}` : validPlayerNames[0]) 
+      : 'No players online';
+
     msg.reply(`Currently ${playerCount} ${playerCount > 1 ? "players" : "player"} online:\n\`\`\`${formattedNames}\`\`\``);
   } catch (error) {
     console.error('Error fetching data:', error);
