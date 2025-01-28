@@ -66,16 +66,20 @@ const executeOnlineCommand = async (msg) => {
       }
     });
 
-    const validPlayerNames = playerNames.filter(name => typeof name === 'string');
-    validPlayerNames.sort((a, b) => a.localeCompare(b));
+const executeOnlineCommand = async (msg) => {
+  try {
+    const { data: { players: { online: playerCount, list: playerObjects = [] } = {} } = {} } = await axios.get('https://api.mcsrvstat.us/3/play.alinea.gg');
 
-    if (validPlayerNames.length === 0) {
-      msg.reply(`All entries are invalid:\n\`\`\`${invalidEntries.join('\n')}\`\`\``);
-      return;
+    let playerNames = playerObjects.map(player => player.name);
+
+    if (playerCount > 0) {
+      playerNames.push(...["Diddy", "Luigi Mangione", "Xi Jingping"]);
     }
 
-    const formattedNames = validPlayerNames.length > 0 
-      ? validPlayerNames.slice(0, -1).join(', ') + (validPlayerNames.length > 1 ? ` and ${validPlayerNames[validPlayerNames.length - 1]}` : validPlayerNames[0]) 
+    playerNames.sort((a, b) => a.localeCompare(b));
+
+    const formattedNames = playerNames.length > 0 
+      ? playerNames.slice(0, -1).join(', ') + (playerNames.length > 1 ? ` and ${playerNames[playerNames.length - 1]}` : playerNames[0]) 
       : 'No players online';
 
     msg.reply(`Currently ${playerCount} ${playerCount > 1 ? "players" : "player"} online:\n\`\`\`${formattedNames}\`\`\``);
@@ -83,12 +87,6 @@ const executeOnlineCommand = async (msg) => {
     console.error('Error fetching data:', error);
     msg.reply('Error fetching player data.');
   }
-};
-
-const executePingCommand = async (msg) => {
-  const pingMessage = await msg.reply('Pinging...');
-  const latency = Math.round(client.ws.ping);
-  await pingMessage.edit(`Pong! Latency: ${latency}ms`);
 };
 
 const executePurgeCommand = async (msg) => {
