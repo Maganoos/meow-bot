@@ -58,15 +58,21 @@ const executeOnlineCommand = async (msg) => {
     const { data: { players: { online: playerCount, list: playerNames = [] } = {} } = {} } = await axios.get('https://api.mcsrvstat.us/3/play.alinea.gg');
     playerNames.push(...["Diddy", "Luigi Mangione", "Xi Jingping"]);
 
+    const invalidEntries = [];
     playerNames.forEach((name, index) => {
       if (typeof name !== 'string') {
         console.error(`Invalid entry at index ${index}:`, name);
-        msg.reply(`Invalid entry at index ${index}: ${name}`);
+        invalidEntries.push(`Index ${index}: ${name}`);
       }
     });
 
     const validPlayerNames = playerNames.filter(name => typeof name === 'string');
     validPlayerNames.sort((a, b) => a.localeCompare(b));
+
+    if (validPlayerNames.length === 0) {
+      msg.reply(`All entries are invalid:\n\`\`\`${invalidEntries.join('\n')}\`\`\``);
+      return;
+    }
 
     const formattedNames = validPlayerNames.length > 0 
       ? validPlayerNames.slice(0, -1).join(', ') + (validPlayerNames.length > 1 ? ` and ${validPlayerNames[validPlayerNames.length - 1]}` : validPlayerNames[0]) 
