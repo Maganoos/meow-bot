@@ -55,19 +55,6 @@ const executeMathCommand = async (msg) => {
 
 const executeOnlineCommand = async (msg) => {
   try {
-    const { data: { players: { online: playerCount, list: playerNames = [] } = {} } = {} } = await axios.get('https://api.mcsrvstat.us/3/play.alinea.gg');
-    playerNames.push(...["Diddy", "Luigi Mangione", "Xi Jingping"]);
-
-    const invalidEntries = [];
-    playerNames.forEach((name, index) => {
-      if (typeof name !== 'string') {
-        console.error(`Invalid entry at index ${index}:`, name);
-        invalidEntries.push(`Index ${index}: ${name}`);
-      }
-    });
-
-const executeOnlineCommand = async (msg) => {
-  try {
     const { data: { players: { online: playerCount, list: playerObjects = [] } = {} } = {} } = await axios.get('https://api.mcsrvstat.us/3/play.alinea.gg');
 
     let playerNames = playerObjects.map(player => player.name);
