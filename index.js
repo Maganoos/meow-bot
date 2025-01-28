@@ -57,6 +57,14 @@ const executeOnlineCommand = async (msg) => {
   try {
     const { data: { players: { online: playerCount, list: playerNames = [] } = {} } = {} } = await axios.get('https://api.mcsrvstat.us/3/play.alinea.gg');
     playerNames.push(...["Diddy", "Luigi Mangione", "Xi Jingping"]);
+
+  if (typeof name !== 'string') {
+    console.error(`Invalid entry at index ${index}:`, name);
+    await msg.reply(`Invalid entry at index ${index}:`, name)
+  }
+});
+playerNames = playerNames.filter(name => typeof name === 'string');
+
     playerNames.sort((a, b) => a.localeCompare(b));
     const formattedNames = playerNames.length > 0 ? playerNames.slice(0, -1).join(', ') + (playerNames.length > 1 ? ` and ${playerNames[playerNames.length - 1]}` : playerNames[0]) : 'No players online';
     msg.reply(`Currently ${playerCount} ${playerCount > 1 ? "players" : "player"} online:\n\`\`\`${formattedNames}\`\`\``);
