@@ -116,6 +116,23 @@ const executeSkinCommand = async (msg) => {
   }
 };
 
+const executeWikiCommand = async (msg) => {
+    try {
+        const searchTerm = msg.content.split(' ').splice(2).join(' ').trim();
+
+        if (!searchTerm) {
+            return msg.reply("Please provide a search term after `wiki` (e.g., `meow, wiki cats`).");
+        }
+
+        const response = await axios.get(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(searchTerm.replace(/ /g, '_'))}`);
+        
+        msg.reply(`https://en.wikipedia.org/wiki/${response.data.title.replace(/ /g, '_')}`);
+    } catch (error) {
+        msg.reply("An error occurred while searching. Please try again.");
+        console.error("Error executing wiki command:", error);
+    }
+}
+
 const createReply = (replyText) => async (msg) => {
   try {
     const referencedMessage = msg.reference ? await msg.fetchReference() : null;
@@ -155,6 +172,7 @@ client.on('messageCreate', async (msg) => {
     "yes or no": createReply(Math.floor(Math.random() * 2) === 0 ? "Yes" : "No"),
     "what is the meaning of life": createReply("being silly"),
     "who is the most sigma out of all people on earth": createReply("It is I, meow the third of meowington"),
+    "wiki" : executeWikiCommand,
   };
   commandActions["help"] = createReply(`Available commands: \`\`\`${Object.keys(commandActions).sort().join(', ')}\`\`\`\nUse \`meow, :command\` to execute`)
 
