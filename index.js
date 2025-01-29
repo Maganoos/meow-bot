@@ -146,8 +146,6 @@ const executeSkinCommand = async (msg) => {
   }
 };
 
-const axios = require('axios');
-
 async function executeWikiCommand(msg) {
     try {
         const searchTerm = msg.content.split(' ').splice(2).join(' ').trim();
