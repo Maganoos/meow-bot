@@ -53,6 +53,36 @@ const executeMathCommand = async (msg) => {
   }
 };
 
+async function executeMcWikiCommand(msg) {
+    try {
+        const searchTerm = msg.content.split(' ').splice(2).join(' ').trim();
+
+        if (!searchTerm) {
+            return await msg.reply("Please provide a search term after `mcwiki` (e.g., `meow, mcwiki Cats`).");
+        }
+
+        const mcWikiUrl = `https://minecraft.wiki/w/${encodeURIComponent(searchTerm.replace(/ /g, '_'))}`;
+
+        const response = await axios.head(mcWikiUrl);
+
+        if (response.status === 200) {
+            await msg.reply(mcWikiUrl);
+        } else if (response.status === 302) {
+            const newUrl = response.headers.location;
+            if (newUrl) {
+                await msg.reply(`Page redirected to: ${newUrl}`);
+            } else {
+                await msg.reply("Page has been redirected but could not retrieve the new URL.");
+            }
+        } else {
+            await msg.reply("No Minecraft Wiki page found for this search term. Please try a different term.");
+        }
+    } catch (error) {
+        await msg.reply("An error occurred while searching the Minecraft Wiki. Please try again later.");
+        console.error("Error in executeMcWikiCommand:", error);
+    }
+};
+
 const executeOnlineCommand = async (msg) => {
   try {
     const { data: { players: { online: playerCount, list: playerObjects = [] } = {} } = {} } = await axios.get('https://api.mcsrvstat.us/3/play.alinea.gg');
@@ -116,22 +146,27 @@ const executeSkinCommand = async (msg) => {
   }
 };
 
-const executeWikiCommand = async (msg) => {
+const axios = require('axios');
+
+async function executeWikiCommand(msg) {
     try {
         const searchTerm = msg.content.split(' ').splice(2).join(' ').trim();
 
         if (!searchTerm) {
-            return msg.reply("Please provide a search term after `wiki` (e.g., `meow, wiki cats`).");
+            return await msg.reply("Please provide a search term after `wiki` (e.g., `meow, wiki Cats`).");
         }
 
         const response = await axios.get(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(searchTerm.replace(/ /g, '_'))}`);
-        
-        msg.reply(`https://en.wikipedia.org/wiki/${response.data.title.replace(/ /g, '_')}`);
+        await msg.reply(`https://en.wikipedia.org/wiki/${response.data.title.replace(/ /g, '_')}`);
     } catch (error) {
-        msg.reply("An error occurred while searching. Please try again.");
-        console.error("Error executing wiki command:", error);
+        if (error.response && error.response.status === 404) {
+            await msg.reply("No Wikipedia page was found for your search term. Please try a different term.");
+        } else {
+            await msg.reply("An error occurred while searching Wikipedia. Please try again later.");
+        }
+        console.error("Error in executeWikiCommand:", error);
     }
-}
+};
 
 const createReply = (replyText) => async (msg) => {
   try {
