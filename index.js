@@ -194,6 +194,7 @@ client.on('messageCreate', async (msg) => {
     "lobotomize": createReply("🧠🔨"),
     "lovechecker": executeLoveCheckerCommand,
     "math": executeMathCommand,
+    "mcwiki": executeMcWikiCommand,
     "murder": createReply("🔫💨"),
     "online": executeOnlineCommand,
     "ping": executePingCommand,
