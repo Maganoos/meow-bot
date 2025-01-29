@@ -67,13 +67,6 @@ async function executeMcWikiCommand(msg) {
 
         if (response.status === 200) {
             await msg.reply(mcWikiUrl);
-        } else if (response.status === 302) {
-            const newUrl = response.headers.location;
-            if (newUrl) {
-                await msg.reply(`Page redirected to: ${newUrl}`);
-            } else {
-                await msg.reply("Page has been redirected but could not retrieve the new URL.");
-            }
         } else {
             await msg.reply("No Minecraft Wiki page found for this search term. Please try a different term.");
         }
