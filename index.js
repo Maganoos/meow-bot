@@ -32,15 +32,22 @@ const executeCurrencyConverterCommand = async (msg) => {
   const args = msg.content.split(' ').filter(arg => arg.toLowerCase() !== 'to');
   if (args.length < 5) return await msg.reply('Please provide the amount, from currency, and to currency.');
   const [amount, fromCurrency, toCurrency] = [args[2], args[3].toUpperCase(), args[4].toUpperCase()];
+
   try {
     const { data } = await axios.get(`https://moneymorph.dev/api/convert/${amount}/${fromCurrency}/${toCurrency}`);
     const convertedAmount = data.response.toFixed(2);
-    await msg.reply(`\`${amount}\` ${fromCurrency} is approximately \`${convertedAmount}\` ${toCurrency}.`);
+    const formattedAmount = parseFloat(amount).toLocaleString('de-DE', { style: 'currency', currency: fromCurrency });
+    const formattedConvertedAmount = parseFloat(convertedAmount).toLocaleString('de-DE', { style: 'currency', currency: toCurrency });
+
+    await msg.reply(`\`${formattedAmount}\` is approximately \`${formattedConvertedAmount}\`.`);
   } catch (error) {
     console.error('Error fetching currency data:', error);
     await msg.reply('Error fetching currency data.');
   }
 };
+
+
+
 
 const executeGuacCommand = async (msg) => {
   try {
@@ -233,11 +240,11 @@ client.on('messageCreate', async (msg) => {
     "shrek": executeShrekCommand,
     "skin": executeSkinCommand,
     "unlobotomize": createReply("🧠🤕"),
-    "yes or no": createReply(Math.floor(Math.random() * 2) === 0 ? "Yes" : "No"),
     "we need to cook": executeBreakingBadQuoteCommand,
     "what is the meaning of life": createReply("being silly"),
     "who is the most sigma out of all people on earth": createReply("It is I, meow the third of meowington"),
     "wiki" : executeWikiCommand,
+    "yes or no": createReply(Math.floor(Math.random() * 2) === 0 ? "Yes" : "No"),
   };
   commandActions["help"] = createReply(`Available commands: \`\`\`${Object.keys(commandActions).sort().join(', ')}\`\`\`\nUse \`meow, :command\` to execute`)
 
