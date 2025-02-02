@@ -11,10 +11,35 @@ const splitEnvVar = (envVar) => envVar.split(',');
 
 const executeAvatarCommand = async (msg) => {
   const msgMentions = msg.mentions.users;
-  if (msgMentions.size <= 0) return msg.reply('who?');
+  if (msgMentions.size <= 0) return await msg.reply('who?');
   let response = msgMentions.size > 1 ? 'Here are the avatars:' : 'Here is the avatar for:';
   msgMentions.forEach(user => response += `\n[${user.username}](${user.displayAvatarURL()}?size=4096)`);
   await msg.reply(response);
+};
+
+const executeBreakingBadQuoteCommand = async (msg) => {
+  try {
+    const { data } = await axios.get('https://api.breakingbadquotes.xyz/v1/quotes');
+    const { quote, author } = data[0];
+    await msg.reply(`"${quote}" - ${author}`);
+  } catch (error) {
+    console.error('Error fetching Breaking Bad quote:', error);
+    await msg.reply('Error fetching Breaking Bad quote.');
+  }
+};
+
+const executeCurrencyConverterCommand = async (msg) => {
+  const args = msg.content.split(' ').filter(arg => arg.toLowerCase() !== 'to');
+  if (args.length < 5) return await msg.reply('Please provide the amount, from currency, and to currency.');
+  const [amount, fromCurrency, toCurrency] = [args[2], args[3].toUpperCase(), args[4].toUpperCase()];
+  try {
+    const { data } = await axios.get(`https://moneymorph.dev/api/convert/${amount}/${fromCurrency}/${toCurrency}`);
+    const convertedAmount = data.response.toFixed(2);
+    await msg.reply(`\`${amount}\` ${fromCurrency} is approximately \`${convertedAmount}\` ${toCurrency}.`);
+  } catch (error) {
+    console.error('Error fetching currency data:', error);
+    await msg.reply('Error fetching currency data.');
+  }
 };
 
 const executeGuacCommand = async (msg) => {
@@ -29,27 +54,27 @@ const executeGuacCommand = async (msg) => {
 
 const executeHowCommands = async (msg) => {
   const command = msg.content.replace(/meow, how/i, '').replace(/[?!.,;]/g, '').trim().split(/\b is \b/i).filter(word => word.trim() !== '');
-  if (command.length < 2) return msg.reply('who?');
+  if (command.length < 2) return await msg.reply('who?');
   const [description, subject] = [command.slice(0, -1).join(' is ').trim(), command[command.length - 1].trim()];
-  msg.reply(`${subject} is ${Math.floor(Math.random() * 101)}% ${description}`);
+  await msg.reply(`${subject} is ${Math.floor(Math.random() * 101)}% ${description}`);
 };
 
 const executeLoveCheckerCommand = async (msg) => {
   const people = msg.content.split(' ').slice(2).filter(word => word.toLowerCase() !== 'and');
-  if (people.length < 2) return msg.reply('Please provide at least two people to check love for.');
-  msg.reply(`The love between ${people.join(' and ')} is ${Math.floor(Math.random() * 100)}%`);
+  if (people.length < 2) return await msg.reply('Please provide at least two people to check love for.');
+  await msg.reply(`The love between ${people.join(' and ')} is ${Math.floor(Math.random() * 100)}%`);
 };
 
 const executeMathCommand = async (msg) => {
   const expression = msg.content.split(' ').slice(2).join(' ').replace(/\*\*/g, '^').replace(/x/g, '*');
-  if (!expression) return msg.reply('Please provide a mathematical expression to evaluate.');
-  if (expression.replace(/\s+/g, '') === "9+10") return msg.reply('Result: `21` :3');
+  if (!expression) return await msg.reply('Please provide a mathematical expression to evaluate.');
+  if (expression.replace(/\s+/g, '') === "9+10") return await msg.reply('Result: `21` :3');
   try {
     const result = math.evaluate(expression);
     if (result < 100000000000000000) await msg.reply(`Result: \`${result}\``);
   } catch (error) {
     console.error('Error evaluating expression:', error);
-    msg.reply('Invalid mathematical expression.');
+    await msg.reply('Invalid mathematical expression.');
   }
 };
 
@@ -92,10 +117,10 @@ const executeOnlineCommand = async (msg) => {
       ? playerNames.slice(0, -1).join(', ') + (playerNames.length > 1 ? ` and ${playerNames[playerNames.length - 1]}` : playerNames[0]) 
       : 'No players online';
 
-    msg.reply(`Currently ${playerCount} ${playerCount > 1 ? "players" : "player"} online:\n\`\`\`${formattedNames}\`\`\``);
+    await msg.reply(`Currently ${playerCount} ${playerCount > 1 ? "players" : "player"} online:\n\`\`\`${formattedNames}\`\`\``);
   } catch (error) {
     console.error('Error fetching data:', error);
-    msg.reply('Error fetching player data.');
+    await msg.reply('Error fetching player data.');
   }
 };
 
@@ -116,26 +141,36 @@ const executePurgeCommand = async (msg) => {
     let messages = await msg.channel.messages.fetch({ limit: 50 });
     messages = messages.filter(message => message.author.id === client.user.id);
     for (const message of messages.values()) await message.delete();
-    msg.reply(`Deleted ${messages.size} messages sent by ${client.user.username}`);
+    await msg.reply(`Deleted ${messages.size} messages sent by ${client.user.username}`);
   } catch (error) {
     console.error('Error occurred while purging messages:', error);
   }
 };
 
+const executeShrekCommand = async (msg) => {
+  try {
+    const { data: quote } = await axios.get('https://shrekofficial.com/quotes/random');
+    await msg.reply(quote);
+  } catch (error) {
+    console.error('Error fetching Shrek quote:', error);
+    await msg.reply('Error fetching Shrek quote.');
+  }
+};
+
 const executeSkinCommand = async (msg) => {
   const args = msg.content.split(' ');
-  if (args.length !== 3) return msg.reply('Please provide only one username.');
+  if (args.length !== 3) return await msg.reply('Please provide only one username.');
   const username = args[2];
   try {
     const { data: { name: correctUsername, id: uuid } } = await axios.get(`https://api.mojang.com/users/profiles/minecraft/${username}`);
     const { data: { properties } } = await axios.get(`https://sessionserver.mojang.com/session/minecraft/profile/${uuid}`, { headers: { 'Accept': 'application/json' } });
     const skinData = properties.find(prop => prop.name === 'textures');
-    if (!skinData) return msg.reply(`No skin found for ${correctUsername}.`);
+    if (!skinData) return await msg.reply(`No skin found for ${correctUsername}.`);
     const { textures: { SKIN: { url: skinUrl } } } = JSON.parse(Buffer.from(skinData.value, 'base64').toString('utf-8'));
-    msg.reply(`Here is the skin for:\n[${correctUsername}](${skinUrl})\n[Render](https://starlightskins.lunareclipse.studio/render/mojavatar/${uuid}/full)`);
+    await msg.reply(`Here is the skin for:\n[${correctUsername}](${skinUrl})\n[Render](https://starlightskins.lunareclipse.studio/render/mojavatar/${uuid}/full)`);
   } catch (error) {
     console.error('Error fetching skin:', error);
-    msg.reply(error.response?.status === 404 ? `User ${username} not found.` : `There was an issue with the API: ${error.response?.status} ${error.response?.statusText}`);
+    await msg.reply(error.response?.status === 404 ? `User ${username} not found.` : `There was an issue with the API: ${error.response?.status} ${error.response?.statusText}`);
   }
 };
 
@@ -162,10 +197,10 @@ async function executeWikiCommand(msg) {
 const createReply = (replyText) => async (msg) => {
   try {
     const referencedMessage = msg.reference ? await msg.fetchReference() : null;
-    await (referencedMessage ? referencedMessage.reply(replyText) : msg.reply(replyText));
+    await (referencedMessage ? referencedMessage.reply(replyText) : await msg.reply(replyText));
   } catch (error) {
     console.error("erm wattesigma", error);
-    msg.reply("oops");
+    await msg.reply("oops");
   }
 };
 
@@ -174,12 +209,14 @@ client.once('ready', () => console.log(`${client.user.username} is ready!`));
 client.on('messageCreate', async (msg) => {
   const messageContent = msg.content.toLowerCase();
   if (!splitEnvVar(CHANNEL_IDS).includes(msg.channel.id) || !messageContent.startsWith('meow,') || msg.author.id === client.user.id) return;
-  if (splitEnvVar(BANNED_IDS).includes(msg.author.id) || splitEnvVar(BANNED_NAMES).includes(msg.author.displayName)) return msg.reply("nuh uh, you're not allowed to use meow");
-  if (splitEnvVar(BANNED_PHRASES).some(phrase => messageContent.includes(phrase)) || (msg.mentions.length > 5) || (messageContent.length > 100) || wash.default.check("en", messageContent.replace(/[^A-Za-z0-9\s]/g, ''))) return msg.reply("Nope");
+  if (splitEnvVar(BANNED_IDS).includes(msg.author.id) || splitEnvVar(BANNED_NAMES).includes(msg.author.displayName)) return await msg.reply("nuh uh, you're not allowed to use meow");
+  if (splitEnvVar(BANNED_PHRASES).some(phrase => messageContent.includes(phrase)) || (msg.mentions.length > 5) || (messageContent.length > 100) || wash.default.check("en", messageContent.replace(/[^A-Za-z0-9\s]/g, ''))) return await msg.reply("Nope");
 
   const commandActions = {
+    "1-100": createReply(String(Math.floor(Math.random() * 101))),
     "avatar": executeAvatarCommand,
     "brutally murder": createReply("🔫💨"),
+    "currency": executeCurrencyConverterCommand,
     "elevator": createReply(`The elevator is in the ${new Date().getMinutes() % 10 <= 5 ? "Overworld" : "Underground"}`),
     "guac": executeGuacCommand,
     "how": executeHowCommands,
@@ -193,10 +230,11 @@ client.on('messageCreate', async (msg) => {
     "ping": executePingCommand,
     "purge": executePurgeCommand,
     "repo": createReply("https://github.com/Maganoos/meow-bot"),
-    "1-100": createReply(String(Math.floor(Math.random() * 101))),
+    "shrek": executeShrekCommand,
     "skin": executeSkinCommand,
     "unlobotomize": createReply("🧠🤕"),
     "yes or no": createReply(Math.floor(Math.random() * 2) === 0 ? "Yes" : "No"),
+    "we need to cook": executeBreakingBadQuoteCommand,
     "what is the meaning of life": createReply("being silly"),
     "who is the most sigma out of all people on earth": createReply("It is I, meow the third of meowington"),
     "wiki" : executeWikiCommand,
