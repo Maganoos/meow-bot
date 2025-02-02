@@ -31,8 +31,11 @@ const executeBreakingBadQuoteCommand = async (msg) => {
 const executeCurrencyConverterCommand = async (msg) => {
   const message = await msg.reply("Hold on...");
   const args = msg.content.split(' ').filter(arg => !['to', 'in'].includes(arg.toLowerCase()) && arg !== '');
-  if (args.length < 5) return await message.edit('Please provide the amount, from currency, and to currency.');
-  const [amount, fromCurrency, toCurrency] = [args[2], args[3].toUpperCase(), args[4].toUpperCase()];
+  if (args.length < 5) {
+    await message.delete();
+    await msg.reply('Please provide the amount, from currency, and to currency.');
+    return
+  }const [amount, fromCurrency, toCurrency] = [args[2], args[3].toUpperCase(), args[4].toUpperCase()];
 
   try {
     const { data } = await axios.get(`https://moneymorph.dev/api/convert/${amount}/${fromCurrency}/${toCurrency}`);
@@ -40,10 +43,12 @@ const executeCurrencyConverterCommand = async (msg) => {
     const formattedAmount = parseFloat(amount).toLocaleString('de-DE', { style: 'currency', currency: fromCurrency });
     const formattedConvertedAmount = parseFloat(convertedAmount).toLocaleString('de-DE', { style: 'currency', currency: toCurrency });
 
-    await message.edit(`\`${formattedAmount}\` is approximately \`${formattedConvertedAmount}\`.`);
+    await message.delete();
+    await msg.reply(`\`${formattedAmount}\` is approximately \`${formattedConvertedAmount}\`.`)
   } catch (error) {
     console.error('Error fetching currency data:', error);
-    await message.edit('Error fetching currency data.');
+    await message.delete();
+    await msg.reply('Error fetching currency data.')
   }
 };
 
