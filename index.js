@@ -29,8 +29,9 @@ const executeBreakingBadQuoteCommand = async (msg) => {
 };
 
 const executeCurrencyConverterCommand = async (msg) => {
-  const args = msg.content.split(' ').filter(arg => arg.toLowerCase() !== 'to');
-  if (args.length < 5) return await msg.reply('Please provide the amount, from currency, and to currency.');
+  const message = await msg.reply("Hold on...");
+  const args = msg.content.split(' ').filter(arg => !['to', 'in'].includes(arg.toLowerCase()) && arg !== '');
+  if (args.length < 5) return await message.edit('Please provide the amount, from currency, and to currency.');
   const [amount, fromCurrency, toCurrency] = [args[2], args[3].toUpperCase(), args[4].toUpperCase()];
 
   try {
@@ -39,10 +40,10 @@ const executeCurrencyConverterCommand = async (msg) => {
     const formattedAmount = parseFloat(amount).toLocaleString('de-DE', { style: 'currency', currency: fromCurrency });
     const formattedConvertedAmount = parseFloat(convertedAmount).toLocaleString('de-DE', { style: 'currency', currency: toCurrency });
 
-    await msg.reply(`\`${formattedAmount}\` is approximately \`${formattedConvertedAmount}\`.`);
+    await message.edit(`\`${formattedAmount}\` is approximately \`${formattedConvertedAmount}\`.`);
   } catch (error) {
     console.error('Error fetching currency data:', error);
-    await msg.reply('Error fetching currency data.');
+    await message.edit('Error fetching currency data.');
   }
 };
 
