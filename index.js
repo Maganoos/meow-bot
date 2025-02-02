@@ -29,14 +29,13 @@ const executeBreakingBadQuoteCommand = async (msg) => {
 };
 
 const executeCurrencyConverterCommand = async (msg) => {
-  const message = await msg.reply("Hold on...");
   const args = msg.content.split(' ').filter(arg => !['to', 'in'].includes(arg.toLowerCase()) && arg !== '');
   if (args.length < 5) {
-    await message.delete();
     await msg.reply('Please provide the amount, from currency, and to currency.');
     return
-  }const [amount, fromCurrency, toCurrency] = [args[2], args[3].toUpperCase(), args[4].toUpperCase()];
-
+  }
+  const [amount, fromCurrency, toCurrency] = [args[2], args[3].toUpperCase(), args[4].toUpperCase()];
+  const message = await msg.reply("Hold on...");
   try {
     const { data } = await axios.get(`https://moneymorph.dev/api/convert/${amount}/${fromCurrency}/${toCurrency}`);
     const convertedAmount = data.response.toFixed(2);
