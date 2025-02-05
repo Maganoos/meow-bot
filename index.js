@@ -3,11 +3,22 @@ import axios from 'axios';
 import { create, all } from 'mathjs';
 const wash = await import('washyourmouthoutwithsoap');
 
-const { CHANNEL_IDS, BANNED_PHRASES, BANNED_IDS, BANNED_NAMES, TOKEN } = process.env;
+const { CHANNEL_IDS, BANNED_PHRASES, BANNED_IDS, BANNED_NAMES, PREFIXES, TOKEN } = process.env;
 const client = new Client();
 const math = create(all, {unsafe: false });
 
-const splitEnvVar = (envVar) => envVar.split(',');
+const splitEnvVar = (envVar) => envVar.match(/meow, |[^,]+/g);
+
+const removePrefixes = (str, cmd) => {
+  let result = String(str);
+  for (const prefix of splitEnvVar(PREFIXES)) {
+    if (str.startsWith(prefix)) {
+      result = str.slice(prefix.length + cmd.length);
+      break;
+    }
+  }
+  return result.trim();
+}
 
 const executeAvatarCommand = async (msg) => {
   const msgMentions = msg.mentions.users;
@@ -29,14 +40,15 @@ const executeBreakingBadQuoteCommand = async (msg) => {
 };
 
 const executeCurrencyConverterCommand = async (msg) => {
-  const args = msg.content.split(' ').filter(arg => !['to', 'in'].includes(arg.toLowerCase()) && arg !== '');
-  if (args.length < 5) {
+  const args = removePrefixes(msg.content, 'currency').split(' ').filter(arg => !['to', 'in'].includes(arg.toLowerCase()) && arg !== '');
+  if (args.length < 3) {
     await msg.reply('Please provide the amount, from currency, and to currency.');
-    return
+    return;
   }
-  const [amount, fromCurrency, toCurrency] = [args[2], args[3].toUpperCase(), args[4].toUpperCase()];
-  const message = await msg.reply("Hold on...");
+  const [amount, fromCurrency, toCurrency] = [args[0], args[1].toUpperCase(), args[2].toUpperCase()];
+
   try {
+    const message = await msg.reply("Hold on...");
     const { data } = await axios.get(`https://moneymorph.dev/api/convert/${amount}/${fromCurrency}/${toCurrency}`);
     const convertedAmount = data.response.toFixed(2);
     const formattedAmount = parseFloat(amount).toLocaleString('de-DE', { style: 'currency', currency: fromCurrency });
@@ -46,13 +58,9 @@ const executeCurrencyConverterCommand = async (msg) => {
     await msg.reply(`\`${formattedAmount}\` is approximately \`${formattedConvertedAmount}\`.`)
   } catch (error) {
     console.error('Error fetching currency data:', error);
-    await message.delete();
     await msg.reply('Error fetching currency data.')
   }
 };
-
-
-
 
 const executeGuacCommand = async (msg) => {
   try {
@@ -65,20 +73,20 @@ const executeGuacCommand = async (msg) => {
 };
 
 const executeHowCommands = async (msg) => {
-  const command = msg.content.replace(/meow, how/i, '').replace(/[?!.,;]/g, '').trim().split(/\b is \b/i).filter(word => word.trim() !== '');
+  const command = removePrefixes(msg.content, 'how').replace(/[?!.,;]/g, '').split(/\b is \b/i).filter(word => word.trim() !== '');
   if (command.length < 2) return await msg.reply('who?');
-  const [description, subject] = [command.slice(0, -1).join(' is ').trim(), command[command.length - 1].trim()];
+  const [description, subject] = [command.slice(0, -1).join(' is '), command[command.length - 1]];
   await msg.reply(`${subject} is ${Math.floor(Math.random() * 101)}% ${description}`);
 };
 
 const executeLoveCheckerCommand = async (msg) => {
-  const people = msg.content.split(' ').slice(2).filter(word => word.toLowerCase() !== 'and');
+  const people = removePrefixes(msg.content, 'lovechecker').split(' and ').filter(word => word.toLowerCase() !== 'and');
   if (people.length < 2) return await msg.reply('Please provide at least two people to check love for.');
   await msg.reply(`The love between ${people.join(' and ')} is ${Math.floor(Math.random() * 100)}%`);
 };
 
 const executeMathCommand = async (msg) => {
-  const expression = msg.content.split(' ').slice(2).join(' ').replace(/\*\*/g, '^').replace(/x/g, '*');
+  const expression = removePrefixes(msg.content, 'math').replace(/\*\*/g, '^').replace(/x/g, '*');
   if (!expression) return await msg.reply('Please provide a mathematical expression to evaluate.');
   if (expression.replace(/\s+/g, '') === "9+10") return await msg.reply('Result: `21` :3');
   try {
@@ -91,45 +99,45 @@ const executeMathCommand = async (msg) => {
 };
 
 async function executeMcWikiCommand(msg) {
-    try {
-        const searchTerm = msg.content.split(' ').splice(2).join(' ').trim();
+  try {
+    const searchTerm = removePrefixes(msg.content, 'mcwiki');
 
-        if (!searchTerm) {
-            return await msg.reply("Please provide a search term after `mcwiki` (e.g., `meow, mcwiki Cats`).");
-        }
-
-        const mcWikiUrl = `https://minecraft.wiki/w/${encodeURIComponent(searchTerm.replace(/ /g, '_'))}`;
-
-        const response = await axios.head(mcWikiUrl);
-
-        if (response.status === 200) {
-            await msg.reply(mcWikiUrl);
-        } else {
-            await msg.reply("No Minecraft Wiki page found for this search term. Please try a different term.");
-        }
-    } catch (error) {
-        await msg.reply("An error occurred while searching the Minecraft Wiki. Please try again later.");
-        console.error("Error in executeMcWikiCommand:", error);
+    if (!searchTerm) {
+      return await msg.reply("Please provide a search term after `mcwiki` (e.g., `meow, mcwiki Cats`).");
     }
-};
+
+    const mcWikiUrl = `https://minecraft.wiki/w/${encodeURIComponent(searchTerm.replace(/ /g, '_'))}`;
+
+    const response = await axios.head(mcWikiUrl);
+
+    if (response.status === 200) {
+      await msg.reply(mcWikiUrl);
+    } else {
+      await msg.reply("No Minecraft Wiki page found for this search term. Please try a different term.");
+    }
+  } catch (error) {
+    await msg.reply("An error occurred while searching the Minecraft Wiki. Please try again later.");
+    console.error("Error in executeMcWikiCommand:", error);
+  }
+}
 
 const executeOnlineCommand = async (msg) => {
+  const server = removePrefixes(msg.content, 'online') || 'play.alinea.gg';
   try {
-    const { data: { players: { online: playerCount, list: playerObjects = [] } = {} } = {} } = await axios.get('https://api.mcsrvstat.us/3/play.alinea.gg');
+    const { data: { players: { online: playerCount, list: playerObjects = [] } = {} } = {} } = await axios.get(`https://api.mcsrvstat.us/3/${server}`);
 
     let playerNames = playerObjects.map(player => player.name);
 
     if (playerCount > 0) {
       playerNames.push(...["Diddy", "Luigi Mangione", "Xi Jingping"]);
+      playerNames.sort((a, b) => a.localeCompare(b));
+      const formattedNames = playerNames.length > 1
+          ? playerNames.slice(0, -1).join(', ') + ` and ${playerNames[playerNames.length - 1]}`
+          : playerNames[0];
+      await msg.reply(`Currently ${playerCount} ${playerCount > 1 ? "players" : "player"} online:\n\`\`\`${formattedNames}\`\`\``);
+    } else {
+      await msg.reply('No players online');
     }
-
-    playerNames.sort((a, b) => a.localeCompare(b));
-
-    const formattedNames = playerNames.length > 0 
-      ? playerNames.slice(0, -1).join(', ') + (playerNames.length > 1 ? ` and ${playerNames[playerNames.length - 1]}` : playerNames[0]) 
-      : 'No players online';
-
-    await msg.reply(`Currently ${playerCount} ${playerCount > 1 ? "players" : "player"} online:\n\`\`\`${formattedNames}\`\`\``);
   } catch (error) {
     console.error('Error fetching data:', error);
     await msg.reply('Error fetching player data.');
@@ -170,9 +178,8 @@ const executeShrekCommand = async (msg) => {
 };
 
 const executeSkinCommand = async (msg) => {
-  const args = msg.content.split(' ');
-  if (args.length !== 3) return await msg.reply('Please provide only one username.');
-  const username = args[2];
+  const username = removePrefixes(msg.content, 'skin');
+  if (!username) return await msg.reply('Please provide only one username.');
   try {
     const { data: { name: correctUsername, id: uuid } } = await axios.get(`https://api.mojang.com/users/profiles/minecraft/${username}`);
     const { data: { properties } } = await axios.get(`https://sessionserver.mojang.com/session/minecraft/profile/${uuid}`, { headers: { 'Accept': 'application/json' } });
@@ -187,24 +194,24 @@ const executeSkinCommand = async (msg) => {
 };
 
 async function executeWikiCommand(msg) {
-    try {
-        const searchTerm = msg.content.split(' ').splice(2).join(' ').trim();
+  try {
+    const searchTerm = removePrefixes(msg.content, 'wiki');
 
-        if (!searchTerm) {
-            return await msg.reply("Please provide a search term after `wiki` (e.g., `meow, wiki Cats`).");
-        }
-
-        const response = await axios.get(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(searchTerm.replace(/ /g, '_'))}`);
-        await msg.reply(`https://en.wikipedia.org/wiki/${response.data.title.replace(/ /g, '_')}`);
-    } catch (error) {
-        if (error.response && error.response.status === 404) {
-            await msg.reply("No Wikipedia page was found for your search term. Please try a different term.");
-        } else {
-            await msg.reply("An error occurred while searching Wikipedia. Please try again later.");
-        }
-        console.error("Error in executeWikiCommand:", error);
+    if (!searchTerm) {
+      return await msg.reply("Please provide a search term after `wiki` (e.g., `meow, wiki Cats`).");
     }
-};
+
+    const response = await axios.get(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(searchTerm.replace(/ /g, '_'))}`);
+    await msg.reply(`https://en.wikipedia.org/wiki/${response.data.title.replace(/ /g, '_')}`);
+  } catch (error) {
+    if (error.response && error.response.status === 404) {
+      await msg.reply("No Wikipedia page was found for your search term. Please try a different term.");
+    } else {
+      await msg.reply("An error occurred while searching Wikipedia. Please try again later.");
+    }
+    console.error("Error in executeWikiCommand:", error);
+  }
+}
 
 const createReply = (replyText) => async (msg) => {
   try {
@@ -220,7 +227,7 @@ client.once('ready', () => console.log(`${client.user.username} is ready!`));
 
 client.on('messageCreate', async (msg) => {
   const messageContent = msg.content.toLowerCase();
-  if (!splitEnvVar(CHANNEL_IDS).includes(msg.channel.id) || !messageContent.startsWith('meow,') || msg.author.id === client.user.id) return;
+  if (!splitEnvVar(CHANNEL_IDS).includes(msg.channel.id) || !splitEnvVar(PREFIXES).some(prefix => messageContent.startsWith(prefix)) || msg.author.id === client.user.id) return;
   if (splitEnvVar(BANNED_IDS).includes(msg.author.id) || splitEnvVar(BANNED_NAMES).includes(msg.author.displayName)) return await msg.reply("nuh uh, you're not allowed to use meow");
   if (splitEnvVar(BANNED_PHRASES).some(phrase => messageContent.includes(phrase)) || (msg.mentions.length > 5) || (messageContent.length > 100) || wash.default.check("en", messageContent.replace(/[^A-Za-z0-9\s]/g, ''))) return await msg.reply("Nope");
 
@@ -253,7 +260,7 @@ client.on('messageCreate', async (msg) => {
   };
   commandActions["help"] = createReply(`Available commands: \`\`\`${Object.keys(commandActions).sort().join(', ')}\`\`\`\nUse \`meow, :command\` to execute`)
 
-  const commandContent = messageContent.replace(/^meow,\s/i, '');
+  const commandContent = splitEnvVar(PREFIXES).reduce((content, prefix) => content.replace(new RegExp(`^${prefix}`, 'i'), ''), messageContent).trim();
   const match = Object.entries(commandActions).find(([key]) => commandContent.startsWith(key));
   if (match) await match[1](msg); else await msg.reply("huh?");
 });
