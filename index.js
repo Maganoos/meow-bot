@@ -12,7 +12,7 @@ const splitEnvVar = (envVar) => envVar.match(/meow, |[^,]+/g);
 const removePrefixes = (str, cmd) => {
   let result = String(str);
   for (const prefix of splitEnvVar(PREFIXES)) {
-    if (str.startsWith(prefix)) {
+    if (str.toLowerCase().startsWith(prefix)) {
       result = str.slice(prefix.length + cmd.length);
       break;
     }
@@ -127,9 +127,7 @@ const executeOnlineCommand = async (msg) => {
     const { data: { players: { online: playerCount, list: playerObjects = [] } = {} } = {} } = await axios.get(`https://api.mcsrvstat.us/3/${server}`);
 
     let playerNames = playerObjects.map(player => player.name);
-
     if (playerCount > 0) {
-      playerNames.push(...["Diddy", "Luigi Mangione", "Xi Jingping"]);
       playerNames.sort((a, b) => a.localeCompare(b));
       const formattedNames = playerNames.length > 1
           ? playerNames.slice(0, -1).join(', ') + ` and ${playerNames[playerNames.length - 1]}`
@@ -224,6 +222,13 @@ const createReply = (replyText) => async (msg) => {
 };
 
 client.once('ready', () => console.log(`${client.user.username} is ready!`));
+
+client.on('messageUpdate', async (oldMessage, newMessage) => {
+  if (newMessage.partial) await newMessage.fetch();
+  if (newMessage.author && newMessage.author.id !== client.user.id) {
+    client.emit('messageCreate', newMessage);
+  }
+});
 
 client.on('messageCreate', async (msg) => {
   const messageContent = msg.content.toLowerCase();
