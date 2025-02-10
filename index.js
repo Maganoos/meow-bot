@@ -144,10 +144,11 @@ const executeOnlineCommand = async (msg) => {
 
 const executePingCommand = async (msg) => {
   try {
-    const sentMessage = await msg.channel.send('Pinging...');
+    const sentMessage = await msg.reply('Pinging...');
     const latency = Date.now() - sentMessage.createdTimestamp;
     const apiLatency = sentMessage.createdTimestamp - msg.createdTimestamp;
-    await sentMessage.edit(`Pong! Latency: ${latency}ms, API Latency: ${apiLatency}ms`);
+    await sentMessage.delete();
+    await msg.reply(`Pong! Latency: ${latency}ms, API Latency: ${apiLatency}ms.`)
   } catch (error) {
     console.error('Error sending ping response:', error);
   }
@@ -186,8 +187,8 @@ const executeSkinCommand = async (msg) => {
     const { textures: { SKIN: { url: skinUrl } } } = JSON.parse(Buffer.from(skinData.value, 'base64').toString('utf-8'));
     await msg.reply(`Here is the skin for:\n[${correctUsername}](${skinUrl})\n[Render](https://starlightskins.lunareclipse.studio/render/mojavatar/${uuid}/full)`);
   } catch (error) {
-    console.error('Error fetching skin:', error);
     await msg.reply(error.response?.status === 404 ? `User ${username} not found.` : `There was an issue with the API: ${error.response?.status} ${error.response?.statusText}`);
+    if (error.response && error.response.status !== 404) console.log(error)
   }
 };
 
