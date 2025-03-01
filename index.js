@@ -275,4 +275,5 @@ client.on('messageCreate', async (msg) => {
 
 client.login(TOKEN);
 
-/* I walk to burger king, then I walk back home from burger king.. */
+/* I walk to burger king, then I walk back home from burger king..
+Our house, in the middle of our house, Our house, in the middle of our house... */
