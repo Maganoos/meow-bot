@@ -130,7 +130,7 @@ const executeOnlineCommand = async (msg) => {
     if (playerCount > 0) {
       playerNames.sort((a, b) => a.localeCompare(b));
       const formattedNames = playerNames.length > 1
-          ? playerNames.slice(0, -1).join(', ') + ` and ${playerNames[playerNames.length - 1]}`
+          ? playerNames.slice(0, -1).join(', ') + `, and ${playerNames[playerNames.length - 1]}`
           : playerNames[0];
       await msg.reply(`Currently ${playerCount} ${playerCount > 1 ? "players" : "player"} online:\n\`\`\`${formattedNames}\`\`\``);
     } else {
@@ -252,6 +252,7 @@ client.on('messageCreate', async (msg) => {
     "math": executeMathCommand,
     "mcwiki": executeMcWikiCommand,
     "murder": createReply("🔫💨"),
+    "offline": createReply("Hmmm..... Just about every minecraft player I think. 🧠🔨"),
     "online": executeOnlineCommand,
     "ping": executePingCommand,
     "purge": executePurgeCommand,
@@ -273,3 +274,5 @@ client.on('messageCreate', async (msg) => {
 });
 
 client.login(TOKEN);
+
+/* I walk to burger king, then I walk back home from burger king.. */
