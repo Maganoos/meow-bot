@@ -92,6 +92,7 @@ const executeMathCommand = async (msg) => {
   try {
     const result = math.evaluate(expression);
     if (result < 100000000000000000) await msg.reply(`Result: \`${result}\``);
+    else await msg.reply("icl ts pmo sm n sb rn ngl, r u srsly srs n fr rn vro? Smh lol atp js go 💔... b fr vro, idek nm, brb gng gtg atm lmao, bt ts pmo 2 js lmk lol onb fr, ac nvm b wt istg ts vro keys🙏💔 ts pmo")
   } catch (error) {
     console.error('Error evaluating expression:', error);
     await msg.reply('Invalid mathematical expression.');
