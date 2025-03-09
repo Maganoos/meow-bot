@@ -92,7 +92,7 @@ const executeMathCommand = async (msg) => {
   try {
     const result = math.evaluate(expression);
     if (result < 100000000000000000) await msg.reply(`Result: \`${result}\``);
-    else await msg.reply("icl ts pmo sm n sb rn ngl, r u srsly srs n fr rn vro? Smh lol atp js go 💔... b fr vro, idek nm, brb gng gtg atm lmao, bt ts pmo 2 js lmk lol onb fr, ac nvm b wt istg ts vro keys🙏💔 ts pmo")
+    else await msg.reply(Math.floor(Math.random() * 2) == 1 ? "icl ts pmo sm n sb rn ngl, r u srsly srs n fr rn vro? Smh lol atp js go 💔... b fr vro, idek nm, brb gng gtg atm lmao, bt ts pmo 2 js lmk lol onb fr, ac nvm b wt istg ts vro keys🙏💔 ts pmo" : "ngl ts pmo sm lk icl vro 💔")
   } catch (error) {
     console.error('Error evaluating expression:', error);
     await msg.reply('Invalid mathematical expression.');
@@ -245,6 +245,7 @@ client.on('messageCreate', async (msg) => {
     "brutally murder": createReply("🔫💨"),
     "currency": executeCurrencyConverterCommand,
     "elevator": createReply(`The elevator is in the ${new Date().getMinutes() % 10 <= 5 ? "Overworld" : "Underground"}`),
+    "give me a ": createReply(`*${removePrefixes(msg.content, 'give me a')}*`),
     "guac": executeGuacCommand,
     "how": executeHowCommands,
     "kill": createReply("🔫💨"),
