@@ -133,7 +133,7 @@ const executeOnlineCommand = async (msg) => {
       const formattedNames = playerNames.length > 1
           ? playerNames.slice(0, -1).join(', ') + `, and ${playerNames[playerNames.length - 1]}`
           : playerNames[0];
-      await msg.reply(`Currently ${playerCount} ${playerCount > 1 ? "players" : "player"} online on ${server} (running ${mc_version}):\n\`\`\`${formattedNames}\`\`\``);
+      await msg.reply(`Currently ${playerCount} ${playerCount > 1 ? "players" : "player"} online on \`${server}\` (running \`${mc_version}\`):\n\`\`\`${formattedNames}\`\`\``);
     } else {
       await msg.reply('No players online');
     }
