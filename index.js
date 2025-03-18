@@ -125,7 +125,7 @@ async function executeMcWikiCommand(msg) {
 const executeOnlineCommand = async (msg) => {
   const server = removePrefixes(msg.content, 'online') || 'play.alinea.gg';
   try {
-    const { data: { version: mc_version, players: { online: playerCount, list: playerObjects = [] } = {} } = {} } = await axios.get(`https://api.mcsrvstat.us/3/${server}`);
+    const { data: { players: { online: playerCount, list: playerObjects = [] } = {} } = {} } = await axios.get(`https://api.mcsrvstat.us/3/${server}`);
 
     let playerNames = playerObjects.map(player => player.name);
     if (playerCount > 0) {
@@ -133,7 +133,7 @@ const executeOnlineCommand = async (msg) => {
       const formattedNames = playerNames.length > 1
           ? playerNames.slice(0, -1).join(', ') + `, and ${playerNames[playerNames.length - 1]}`
           : playerNames[0];
-      await msg.reply(`Currently ${playerCount} ${playerCount > 1 ? "players" : "player"} online on \`${server}\` (running \`${mc_version}\`):\n\`\`\`${formattedNames}\`\`\``);
+      await msg.reply(`Currently ${playerCount} ${playerCount > 1 ? "players" : "player"} online:\n\`\`\`${formattedNames}\`\`\``);
     } else {
       await msg.reply('No players online');
     }
