@@ -130,12 +130,12 @@ const executeOnlineCommand = async (msg) => {
     let playerNames = playerObjects.map(player => player.name);
     if (playerCount > 0) {
       playerNames.sort((a, b) => a.localeCompare(b));
-      const formattedNames = playerNames.length > 1
+      const formattedNames = playerNames.length > 2
           ? playerNames.slice(0, -1).join(', ') + `, and ${playerNames[playerNames.length - 1]}`
-          : playerNames.length == 2 ? `${playerNames[0]} and ${playerNames[1]}` : playerNames[0];
+          : playerNames.length === 2 ? `${playerNames[0]} and ${playerNames[1]}` : playerNames[0];
       await msg.reply(`Currently ${playerCount} ${playerCount > 1 ? "players" : "player"} online:\n\`\`\`${formattedNames}\`\`\``);
     } else {
-      await msg.reply('No players online');
+      await msg.reply('No players online or server offline');
     }
   } catch (error) {
     console.error('Error fetching data:', error);
