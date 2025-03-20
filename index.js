@@ -132,7 +132,7 @@ const executeOnlineCommand = async (msg) => {
       playerNames.sort((a, b) => a.localeCompare(b));
       const formattedNames = playerNames.length > 1
           ? playerNames.slice(0, -1).join(', ') + `, and ${playerNames[playerNames.length - 1]}`
-          : playerNames[0];
+          : playerNames.length == 2 ? `${playerNames[0]} and ${playerNames[1]}` : playerNames[0];
       await msg.reply(`Currently ${playerCount} ${playerCount > 1 ? "players" : "player"} online:\n\`\`\`${formattedNames}\`\`\``);
     } else {
       await msg.reply('No players online');
