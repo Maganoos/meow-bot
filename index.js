@@ -142,12 +142,12 @@ async function executeMcWikiCommand(msg) {
 
 const executeOnlineCommand = async (msg) => {
   try {
-    const { data: { onlineplayers, numPlayers } = {} } = await axios.get('http://online:3000/online');
+    const { data: { onlinePlayers, numPlayers } = {} } = await axios.get('http://online:3000/online');
 
     if (numPlayers === 0) {
       await msg.reply('No players online or server offline');
     } else {
-      await msg.reply(`Currently ${numPlayers} ${numPlayers > 1 ? "players" : "player"} online:\n\`\`\`${onlineplayers}\`\`\``);
+      await msg.reply(`Currently ${numPlayers} ${numPlayers > 1 ? "players" : "player"} online:\n\`\`\`${onlinePlayers}\`\`\``);
     }
   } catch (error) {
     console.error('Error fetching data:', error);
