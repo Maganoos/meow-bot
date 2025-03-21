@@ -16,11 +16,20 @@ const executeOnline = (msg) => {
   const method = msg.content.includes("joined the game") ? 'post' : msg.content.includes("left the game") ? 'delete' : null;
 
   if (method) {
-    axios[method](`https://online.magkari.eu/user/${userName}`, {
+    const url = `https://online.magkari.eu/user/${userName}`;
+    const config = {
       headers: { 'Authorization': `Bearer ${process.env.ONLINE_TOKEN}` }
-    }).catch(error => {
-      console.error(`Error while ${method}ing user ${userName}:`, error);
-    });
+    };
+
+    if (method === 'post') {
+      axios.post(url, {}, config).catch(error => {
+        console.error(`Error while posting user ${userName}:`, error);
+      });
+    } else if (method === 'delete') {
+      axios.delete(url, config).catch(error => {
+        console.error(`Error while deleting user ${userName}:`, error);
+      });
+    }
   }
 }
 
