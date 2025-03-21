@@ -9,6 +9,24 @@ const math = create(all, {unsafe: false });
 
 const splitEnvVar = (envVar) => envVar.match(/meow, |[^,]+/g);
 
+const executeOnline = (msg) => {
+  const userName = msg.content.split(' ')[0];
+
+  if (msg.content.includes("joined the game")) {
+    axios.post(`http://online:3000/user/${userName}`)
+      .catch(error => {
+        console.error(`Error while posting user ${userName} join event:`, error);
+      });
+  }
+
+  if (msg.content.includes("left the game")) {
+    axios.delete(`http://online:3000/user/${userName}`)
+      .catch(error => {
+        console.error(`Error while sending DELETE request for user ${userName}:`, error);
+      });
+  }
+}
+
 const removePrefixes = (str, cmd) => {
   let result = String(str);
   for (const prefix of splitEnvVar(PREFIXES)) {
@@ -123,25 +141,20 @@ async function executeMcWikiCommand(msg) {
 }
 
 const executeOnlineCommand = async (msg) => {
-  const server = removePrefixes(msg.content, 'online') || 'play.alinea.gg';
   try {
-    const { data: { players: { online: playerCount, list: playerObjects = [] } = {} } = {} } = await axios.get(`https://api.mcsrvstat.us/3/${server}`);
+    const { data: { onlineplayers, numPlayers } = {} } = await axios.get('http://online:3000/online');
 
-    let playerNames = playerObjects.map(player => player.name);
-    if (playerCount > 0) {
-      playerNames.sort((a, b) => a.localeCompare(b));
-      const formattedNames = playerNames.length > 2
-          ? playerNames.slice(0, -1).join(', ') + `, and ${playerNames[playerNames.length - 1]}`
-          : playerNames.length === 2 ? `${playerNames[0]} and ${playerNames[1]}` : playerNames[0];
-      await msg.reply(`Currently ${playerCount} ${playerCount > 1 ? "players" : "player"} online:\n\`\`\`${formattedNames}\`\`\``);
-    } else {
+    if (numPlayers === 0) {
       await msg.reply('No players online or server offline');
+    } else {
+      await msg.reply(`Currently ${numPlayers} ${numPlayers > 1 ? "players" : "player"} online:\n\`\`\`${onlineplayers}\`\`\``);
     }
   } catch (error) {
     console.error('Error fetching data:', error);
     await msg.reply('Error fetching player data.');
   }
 };
+
 
 const executePingCommand = async (msg) => {
   try {
@@ -233,6 +246,7 @@ client.on('messageUpdate', async (oldMessage, newMessage) => {
 });
 
 client.on('messageCreate', async (msg) => {
+  if (["885157323880935474", "728771876356096013"].includes(msg.author.id)) if (msg.content.includes("joined the game") || msg.content.includes("left the game")) executeOnline(msg);
   const messageContent = msg.content.toLowerCase();
   if (!splitEnvVar(CHANNEL_IDS).includes(msg.channel.id) || !splitEnvVar(PREFIXES).some(prefix => messageContent.startsWith(prefix)) || msg.author.id === client.user.id) return;
   if (splitEnvVar(BANNED_IDS).includes(msg.author.id) || splitEnvVar(BANNED_NAMES).includes(msg.author.displayName)) return await msg.reply("nuh uh, you're not allowed to use meow");
