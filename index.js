@@ -3,7 +3,9 @@ import axios from 'axios';
 import { create, all } from 'mathjs';
 const wash = await import('washyourmouthoutwithsoap');
 
-const { CHANNEL_IDS, BANNED_PHRASES, BANNED_IDS, BANNED_NAMES, ONLINE_TOKEN, PREFIXES, TOKEN } = process.env;
+console.log(process.env.ONLINE_TOKEN)
+
+const { CHANNEL_IDS, BANNED_PHRASES, BANNED_IDS, BANNED_NAMES, PREFIXES, TOKEN } = process.env;
 const client = new Client();
 const math = create(all, {unsafe: false });
 
@@ -15,7 +17,7 @@ const executeOnline = (msg) => {
 
   if (method) {
     axios[method](`https://online.magkari.eu/user/${userName}`, {
-      headers: { 'Authorization': `Bearer ${ONLINE_TOKEN}` }
+      headers: { 'Authorization': `Bearer ${process.env.ONLINE_TOKEN}` }
     }).catch(error => {
       console.error(`Error while ${method}ing user ${userName}:`, error);
     });
