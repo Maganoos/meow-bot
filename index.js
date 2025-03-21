@@ -36,7 +36,7 @@ const executeOnline = (msg) => {
   const method = msg.content.includes("joined the game") ? 'post' : msg.content.includes("left the game") ? 'delete' : null;
 
   if (method) {
-    const url = `http://online/user/${userName}`;
+    const url = `http://online:3000/user/${userName}`;
 
     if (method === 'post') {
       axios.post(url, {}).catch(error => {
@@ -165,7 +165,7 @@ async function executeMcWikiCommand(msg) {
 
 const executeOnlineCommand = async (msg) => {
   try {
-    const { data: { onlinePlayers, numPlayers } = {} } = await axios.get('http://online/online');
+    const { data: { onlinePlayers, numPlayers } = {} } = await axios.get('http://online:3000/online');
 
     if (numPlayers === 0) {
       await msg.reply('No players online or server offline');
