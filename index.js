@@ -3,15 +3,13 @@ import axios from 'axios';
 import { create, all } from 'mathjs';
 const wash = await import('washyourmouthoutwithsoap');
 
-console.log(process.env.ONLINE_TOKEN)
-
 const { CHANNEL_IDS, BANNED_PHRASES, BANNED_IDS, BANNED_NAMES, PREFIXES, TOKEN } = process.env;
 const client = new Client();
 const math = create(all, {unsafe: false });
 
 const splitEnvVar = (envVar) => envVar.match(/meow, |[^,]+/g);
 
-const executeOnline = (msg) => {
+/*const executeOnline = (msg) => {
   const userName = msg.content.split(' ')[0];
   const method = msg.content.includes("joined the game") ? 'post' : msg.content.includes("left the game") ? 'delete' : null;
 
@@ -27,6 +25,25 @@ const executeOnline = (msg) => {
       });
     } else if (method === 'delete') {
       axios.delete(url, config).catch(error => {
+        console.error(`Error while deleting user ${userName}:`, error);
+      });
+    }
+  }
+}*/
+
+const executeOnline = (msg) => {
+  const userName = msg.content.split(' ')[0];
+  const method = msg.content.includes("joined the game") ? 'post' : msg.content.includes("left the game") ? 'delete' : null;
+
+  if (method) {
+    const url = `http://online/user/${userName}`;
+
+    if (method === 'post') {
+      axios.post(url, {}).catch(error => {
+        console.error(`Error while posting user ${userName}:`, error);
+      });
+    } else if (method === 'delete') {
+      axios.delete(url).catch(error => {
         console.error(`Error while deleting user ${userName}:`, error);
       });
     }
@@ -148,7 +165,7 @@ async function executeMcWikiCommand(msg) {
 
 const executeOnlineCommand = async (msg) => {
   try {
-    const { data: { onlinePlayers, numPlayers } = {} } = await axios.get('https://online.magkari.eu/online');
+    const { data: { onlinePlayers, numPlayers } = {} } = await axios.get('http://online/online');
 
     if (numPlayers === 0) {
       await msg.reply('No players online or server offline');
