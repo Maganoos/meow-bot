@@ -10,7 +10,7 @@ const math = create(all, {unsafe: false });
 const splitEnvVar = (envVar) => envVar.match(/meow, |[^,]+/g);
 
 const executeOnline = async (msg) => {
-  const userName = msg.content.split(' ')[0];
+  const userName = msg.content.split(' ')[0].replace(/\\/g, '');
   const method = msg.content.includes("joined the game") ? 'post' : msg.content.includes("left the game") ? 'delete' : null;
 
   if (method) {
