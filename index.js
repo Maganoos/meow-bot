@@ -9,17 +9,17 @@ const math = create(all, {unsafe: false });
 
 const splitEnvVar = (envVar) => envVar.match(/meow, |[^,]+/g);
 
-const executeOnline = (msg) => {
+const executeOnline = async (msg) => {
   const userName = msg.content.split(' ')[0];
   const method = msg.content.includes("joined the game") ? 'post' : msg.content.includes("left the game") ? 'delete' : null;
 
   if (method) {
     if (method === 'post') {
-      axios.post(`http://online:3000/input?${userName}`, {}).catch(error => {
+      await axios.post(`http://online:3000/input?${userName}`, {}).catch(error => {
         console.error(`Error while posting player ${userName}:`, error);
       });
     } else if (method === 'delete') {
-      axios.delete(`http://online:3000/player/${userName}`).catch(error => {
+      await axios.delete(`http://online:3000/player/${userName}`).catch(error => {
         console.error(`Error while deleting player ${userName}:`, error);
       });
     }
