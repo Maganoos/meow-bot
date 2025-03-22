@@ -15,7 +15,7 @@ const executeOnline = (msg) => {
 
   if (method) {
     if (method === 'post') {
-      axios.post(`http://online:3000/input`, {userName}).catch(error => {
+      axios.post(`http://online:3000/input?${userName}`, {}).catch(error => {
         console.error(`Error while posting player ${userName}:`, error);
       });
     } else if (method === 'delete') {
