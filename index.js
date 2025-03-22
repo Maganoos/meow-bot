@@ -9,42 +9,18 @@ const math = create(all, {unsafe: false });
 
 const splitEnvVar = (envVar) => envVar.match(/meow, |[^,]+/g);
 
-/*const executeOnline = (msg) => {
-  const userName = msg.content.split(' ')[0];
-  const method = msg.content.includes("joined the game") ? 'post' : msg.content.includes("left the game") ? 'delete' : null;
-
-  if (method) {
-    const url = `https://online.magkari.eu/user/${userName}`;
-    const config = {
-      headers: { 'Authorization': `Bearer ${process.env.ONLINE_TOKEN}` }
-    };
-
-    if (method === 'post') {
-      axios.post(url, {}, config).catch(error => {
-        console.error(`Error while posting user ${userName}:`, error);
-      });
-    } else if (method === 'delete') {
-      axios.delete(url, config).catch(error => {
-        console.error(`Error while deleting user ${userName}:`, error);
-      });
-    }
-  }
-}*/
-
 const executeOnline = (msg) => {
   const userName = msg.content.split(' ')[0];
   const method = msg.content.includes("joined the game") ? 'post' : msg.content.includes("left the game") ? 'delete' : null;
 
   if (method) {
-    const url = `http://online:3000/user/${userName}`;
-
     if (method === 'post') {
-      axios.post(url, {}).catch(error => {
-        console.error(`Error while posting user ${userName}:`, error);
+      axios.post(`http://online:3000/input`, {userName}).catch(error => {
+        console.error(`Error while posting player ${userName}:`, error);
       });
     } else if (method === 'delete') {
-      axios.delete(url).catch(error => {
-        console.error(`Error while deleting user ${userName}:`, error);
+      axios.delete(`http://online:3000/player/${userName}`).catch(error => {
+        console.error(`Error while deleting player ${userName}:`, error);
       });
     }
   }
