@@ -140,20 +140,39 @@ async function executeMcWikiCommand(msg) {
 }
 
 const executeOnlineCommand = async (msg) => {
-  try {
-    const { data: { onlinePlayers, numPlayers } = {} } = await axios.get('http://online:3000/online');
+  const srv = removePrefixes(msg.content, 'online').split(/\s/)[0] || "play.alinea.gg";
 
-    if (numPlayers === 0) {
-      await msg.reply('No players online or server offline');
+  try {
+    const response = await axios.get(`https://api.mcstatus.io/v2/status/java/${srv}`);
+
+    if (response.data.online) {
+      const numPlayers = response.data.players.online;
+      const playerNames = response.data.players.list.map(player => player.name_clean);
+
+      if (numPlayers === 0) {
+        await msg.reply(`No players online on \`${srv}\`.`);
+        return;
+      }
+
+      playerNames.sort((a, b) => a.localeCompare(b));
+
+      const formattedNames =
+        playerNames.length > 2
+          ? playerNames.slice(0, -1).join(', ') + `, and ${playerNames[playerNames.length - 1]}`
+          : playerNames.length === 2
+          ? `${playerNames[0]} and ${playerNames[1]}`
+          : playerNames[0];
+
+      await msg.reply(`Currently ${numPlayers} ${numPlayers > 1 ? "players" : "player"} online:\n\`\`\`${formattedNames}\`\`\``);
     } else {
-      await msg.reply(`Currently ${numPlayers} ${numPlayers > 1 ? "players" : "player"} online:\n\`\`\`${onlinePlayers}\`\`\``);
+      await msg.reply('Server is offline.');
     }
   } catch (error) {
+    if (error.status === 404) return await msg.reply(`Server \`${srv}\` not found.`);
     console.error('Error fetching data:', error);
     await msg.reply('Error fetching player data.');
   }
 };
-
 
 const executePingCommand = async (msg) => {
   try {
@@ -281,7 +300,6 @@ client.on('messageCreate', async (msg) => {
     "wiki" : executeWikiCommand,
     "yes or no": createReply(Math.floor(Math.random() * 2) === 0 ? "Yes" : "No"),
   };
-  commandActions["help"] = createReply(`Available commands: \`\`\`${Object.keys(commandActions).sort().join(', ')}\`\`\`\nUse \`meow, :command\` to execute`)
 
   const commandContent = splitEnvVar(PREFIXES).reduce((content, prefix) => content.replace(new RegExp(`^${prefix}`, 'i'), ''), messageContent).trim();
   const match = Object.entries(commandActions).find(([key]) => commandContent.startsWith(key));
