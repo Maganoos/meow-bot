@@ -9,23 +9,6 @@ const math = create(all, {unsafe: false });
 
 const splitEnvVar = (envVar) => envVar.match(/meow, |[^,]+/g);
 
-const executeOnline = async (msg) => {
-  const userName = msg.content.split(' ')[0].replace(/\\/g, '');
-  const method = msg.content.includes("joined the game") ? 'post' : msg.content.includes("left the game") ? 'delete' : null;
-
-  if (method) {
-    if (method === 'post') {
-      await axios.post(`http://online:3000/input?${userName}`, {}).catch(error => {
-        console.error(`Error while posting player ${userName}:`, error);
-      });
-    } else if (method === 'delete') {
-      await axios.delete(`http://online:3000/player/${userName}`).catch(error => {
-        console.error(`Error while deleting player ${userName}:`, error);
-      });
-    }
-  }
-}
-
 const removePrefixes = (str, cmd) => {
   let result = String(str);
   for (const prefix of splitEnvVar(PREFIXES)) {
@@ -264,7 +247,6 @@ client.on('messageUpdate', async (oldMessage, newMessage) => {
 });
 
 client.on('messageCreate', async (msg) => {
-  if (["885157323880935474", "728771876356096013"].includes(msg.author.id)) if (msg.content.includes("joined the game") || msg.content.includes("left the game")) executeOnline(msg);
   const messageContent = msg.content.toLowerCase();
   if (!splitEnvVar(CHANNEL_IDS).includes(msg.channel.id) || !splitEnvVar(PREFIXES).some(prefix => messageContent.startsWith(prefix)) || msg.author.id === client.user.id) return;
   if (splitEnvVar(BANNED_IDS).includes(msg.author.id) || splitEnvVar(BANNED_NAMES).includes(msg.author.displayName)) return await msg.reply("nuh uh, you're not allowed to use meow");
