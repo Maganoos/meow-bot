@@ -275,6 +275,7 @@ client.on('messageCreate', async (msg) => {
     "repo": createReply("https://github.com/Maganoos/meow-bot"),
     "shrek": executeShrekCommand,
     "skin": executeSkinCommand,
+    "spawn": createReply("The Overworld spawn is located at -1520 108 1300.\nThe Underground elevator is located at -1499 40 1297."),
     "unlobotomize": createReply("🧠🤕"),
     "we need to cook": executeBreakingBadQuoteCommand,
     "what is the meaning of life": createReply("being silly"),
