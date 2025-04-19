@@ -248,7 +248,7 @@ client.on('messageUpdate', async (oldMessage, newMessage) => {
 
 client.on('messageCreate', async (msg) => {
   const messageContent = msg.content.toLowerCase();
-  if (messageContent.startsWith("fline")) executeOnlineCommand();
+  if (messageContent.startsWith("fline")) executeOnlineCommand(msg);
   if (!splitEnvVar(CHANNEL_IDS).includes(msg.channel.id) || !splitEnvVar(PREFIXES).some(prefix => messageContent.startsWith(prefix)) || msg.author.id === client.user.id) return;
   if (splitEnvVar(BANNED_IDS).includes(msg.author.id) || splitEnvVar(BANNED_NAMES).includes(msg.author.displayName)) return await msg.reply("nuh uh, you're not allowed to use meow");
   if (splitEnvVar(BANNED_PHRASES).some(phrase => messageContent.includes(phrase)) || (msg.mentions.length > 5) || (messageContent.length > 100) || wash.default.check("en", messageContent.replace(/[^A-Za-z0-9\s]/g, ''))) return await msg.reply("Nope");
