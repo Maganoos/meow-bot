@@ -126,7 +126,7 @@ const executeOnlineCommand = async (msg) => {
   if (!msg.content.toLowerCase().startsWith("fline")) {
     const srv = removePrefixes(msg.content, 'online').split(/\s/)[0] || "play.alinea.gg";
   } else {
-    const srv = "play.alinea.gg;
+    const srv = "play.alinea.gg";
   }
   try {
     const response = await axios.get(`https://api.mcstatus.io/v2/status/java/${srv}`);
