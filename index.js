@@ -170,7 +170,7 @@ const executePingCommand = async (msg) => {
 };
 
 const executePurgeCommand = async (msg) => {
-  if (String(msg.author.id) !== "885157323880935474" && !(String(msg.author.id) === "1050780466137026671" && msg.author.username === "Maganoos")) return await msg.reply("You don't have permission to use this command.");
+  if (String(msg.author.id) !== "1361427638547382496" && !(String(msg.author.id) === "1050780466137026671" && msg.author.username === "Maganoos")) return await msg.reply("You don't have permission to use this command.");
   try {
     let messages = await msg.channel.messages.fetch({ limit: 50 });
     messages = messages.filter(message => message.author.id === client.user.id);
